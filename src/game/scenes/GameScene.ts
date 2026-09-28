@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import type { GameCommand, Level } from '../../types/index.ts'
+import type { GameCommand, Level, RunOutcome } from '../../types/index.ts'
 
 const COLORS = {
   floor: 0x1e293b,
@@ -138,8 +138,8 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  async executeCommands(commands: GameCommand[]): Promise<boolean> {
-    if (!this.level || this.isAnimating) return false
+  async executeCommands(commands: GameCommand[]): Promise<RunOutcome> {
+    if (!this.level || this.isAnimating) return 'goal'
     this.isAnimating = true
 
     for (const cmd of commands) {
@@ -148,7 +148,7 @@ export class GameScene extends Phaser.Scene {
         if (!moved) {
           this.flashPlayer(0xef4444)
           this.isAnimating = false
-          return false
+          return 'wall'
         }
       } else if (cmd.action === 'turn') {
         const dir = (cmd.args.direction as string) ?? 'right'
@@ -171,9 +171,9 @@ export class GameScene extends Phaser.Scene {
 
     if (atGoal && allCollected) {
       this.celebrateWin()
-      return true
+      return 'win'
     }
-    return false
+    return atGoal ? 'items' : 'goal'
   }
 
   private collectItem() {

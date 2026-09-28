@@ -468,5 +468,26 @@
         { "x": 1, "y": 2 }
       ]
     }
+  },
+  {
+    "id": 21,
+    "title": "Kod od AI: trasa do skarbu",
+    "ai": true,
+    "description": "Od teraz kod za ciebie pisze asystent AI, a ty jesteś kontrolerem jakości. AI pisze szybko i zawsze brzmi pewnie — ale często się myli: liczy o jeden krok za dużo, wymyśla komendy, których nie ma, albo robi nie to, o co prosiłeś. Zasada numer 1: nigdy nie ufaj kodowi, którego nie uruchomiłeś.",
+    "objective": "AI miało zebrać skarb i dojść do celu. Uruchom kod, zobacz, gdzie ludzik się myli, i popraw kod AI.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zbierz skarb i dojdź do zielonego pola\"\n# Odpowiedź AI: \"Gotowe, przetestowałem!\"\nfor i in range(4):\n    player.move()\nplayer.collect()\nplayer.turn_left()\nplayer.move()\nplayer.move()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zbierz skarb i dojdź do zielonego pola\"\n# Odpowiedź AI: \"Gotowe, przetestowałem!\"\nfor i in range(3):\n    player.move()\nplayer.collect()\nplayer.turn_left()\nplayer.move()\nplayer.move()\n",
+    "expectedCommands": [],
+    "hints": [
+      "Uruchom kod i patrz, gdzie ludzik zbiera skarb — czy stoi wtedy na żółtym kółku?",
+      "Policz pola od startu do skarbu. Ile razy ludzik naprawdę musi zrobić krok?",
+      "AI dało range(4), a do skarbu są 3 kroki. Zmień na range(3)."
+    ],
+    "grid": {
+      "width": 6, "height": 5,
+      "playerStart": { "x": 0, "y": 2 },
+      "goal": { "x": 3, "y": 0 },
+      "walls": [], "items": [{ "x": 3, "y": 2 }]
+    }
   }
 ]

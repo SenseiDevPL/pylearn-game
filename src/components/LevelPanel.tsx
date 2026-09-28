@@ -17,6 +17,14 @@ export function LevelPanel({ level, currentHint, onShowHint, onShowSolution, sho
         </span>
         <h2 className="text-lg font-bold text-slate-100">{level.title}</h2>
       </div>
+      {level.ai && (
+        <div className="mb-3 bg-violet-950/50 rounded-lg px-3 py-2 border border-violet-700/50">
+          <span className="text-violet-300 text-xs font-semibold uppercase tracking-wider">🤖 Sprawdź kod od AI</span>
+          <p className="text-violet-200/90 text-sm mt-0.5">
+            Kod w edytorze napisał asystent AI. Uruchom go, obserwuj ludzika, znajdź błąd AI i popraw.
+          </p>
+        </div>
+      )}
       <p className="text-slate-300 text-sm mb-3">{level.description}</p>
       <div className="bg-slate-900/50 rounded-lg px-3 py-2 border border-slate-700/30">
         <span className="text-blue-400 text-xs font-semibold uppercase tracking-wider">Cel</span>

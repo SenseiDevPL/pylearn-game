@@ -76,6 +76,23 @@ _json.dumps({
 })
 `
 
+// Common Python errors, said plainly in Polish; the rest stays as-is.
+function explainPythonError(raw: string, fallback: string): string {
+  const last = raw.trim().split('\n').filter(Boolean).pop() ?? raw
+  let m: RegExpMatchArray | null
+  if ((m = last.match(/AttributeError: '_Player' object has no attribute '(\w+)'/)))
+    return `Gracz nie zna komendy player.${m[1]}() — taka komenda nie istnieje. Dostępne: move, turn_left, turn_right, collect, say.`
+  if ((m = last.match(/NameError: name '(\w+)' is not defined/)))
+    return `Nie znam nazwy ${m[1]} — literówka albo zmienna nie została utworzona.`
+  if (/IndentationError/.test(last))
+    return 'Złe wcięcie — linijki w środku pętli, if albo funkcji muszą mieć tyle samo spacji na początku.'
+  if (/SyntaxError/.test(last))
+    return `Błąd pisowni kodu (sprawdź dwukropki, nawiasy i cudzysłowy). Python mówi: ${last}`
+  if ((m = last.match(/TypeError: (.*)/)))
+    return `Zły typ danych: ${m[1]}`
+  return fallback
+}
+
 async function executeCode(code: string, levelId: number): Promise<ExecutionResult> {
   if (!pyodide) throw new Error('Pyodide nie jest gotowe')
 
@@ -118,7 +135,7 @@ async function executeCode(code: string, levelId: number): Promise<ExecutionResu
     return {
       success: false,
       output: '',
-      error: cleanError,
+      error: explainPythonError(errorMsg, cleanError),
       commands: [],
       executionTime,
     }

@@ -7,6 +7,8 @@ export interface Level {
   solution: string
   expectedCommands: string[]
   hints: string[]
+  /** "Check the AI's code" mission: the starter code is an AI's buggy attempt. */
+  ai?: boolean
   grid: {
     width: number
     height: number
@@ -38,5 +40,8 @@ export type WorkerResponse =
   | { type: 'ready' }
   | { type: 'result'; data: ExecutionResult }
   | { type: 'error'; message: string }
+
+/** Why a run ended: reached the goal with everything collected, or what went wrong. */
+export type RunOutcome = 'win' | 'wall' | 'items' | 'goal'
 
 export type GameState = 'idle' | 'running' | 'success' | 'failure'

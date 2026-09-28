@@ -71,11 +71,15 @@ export default function App() {
         return
       }
 
-      const won = await gameRef.current?.executeCommands(result.commands)
-      setGameState(won ? 'success' : 'failure')
-      if (!won) {
+      const outcome = await gameRef.current?.executeCommands(result.commands)
+      setGameState(outcome === 'win' ? 'success' : 'failure')
+      if (outcome === 'wall') {
+        setError('Gracz uderzył w ścianę albo w krawędź planszy (mignął na czerwono). Sprawdź kierunek i liczbę kroków.')
+      } else if (outcome === 'items') {
+        setError('Gracz doszedł do celu, ale nie zebrał wszystkich skarbów. Pamiętaj o player.collect() na polu ze skarbem.')
+      } else if (outcome === 'goal') {
         const moveCount = result.commands.filter(c => c.action === 'move').length
-        setError(`Gracz przeszedł ${moveCount} pól ale nie dotarł do celu. Może potrzebujesz więcej player.move()?`)
+        setError(`Gracz przeszedł ${moveCount} pól, ale nie stanął na zielonym polu. Policz kroki jeszcze raz.`)
       }
     } catch (err) {
       setGameState('failure')

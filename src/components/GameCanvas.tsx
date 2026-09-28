@@ -2,11 +2,11 @@ import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import type Phaser from 'phaser'
 import { createGame } from '../game/PhaserGame.ts'
 import { GameScene } from '../game/scenes/GameScene.ts'
-import type { GameCommand, Level } from '../types/index.ts'
+import type { GameCommand, Level, RunOutcome } from '../types/index.ts'
 
 export interface GameCanvasHandle {
   loadLevel: (level: Level) => void
-  executeCommands: (commands: GameCommand[]) => Promise<boolean>
+  executeCommands: (commands: GameCommand[]) => Promise<RunOutcome>
   resetLevel: () => void
 }
 
@@ -46,7 +46,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle>(function GameCanvas(_prop
       tryLoad()
     },
     async executeCommands(commands: GameCommand[]) {
-      if (!sceneRef.current) return false
+      if (!sceneRef.current) return 'goal'
       return sceneRef.current.executeCommands(commands)
     },
     resetLevel() {

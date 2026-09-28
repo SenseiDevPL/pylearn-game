@@ -40,7 +40,7 @@ export function FeedbackOverlay({ state, error, output, executionTime, onNextLev
           {isLastLevel && (
             <div className="mt-3 bg-indigo-950/50 rounded-lg px-4 py-4 border border-indigo-700/50 text-center">
               <p className="text-indigo-300 font-bold text-lg">Gratulacje! Ukończyłeś PyLearn!</p>
-              <p className="text-indigo-400/80 text-sm mt-1">Przeszedłeś wszystkie 20 poziomów. Jesteś gotowy pisać prawdziwy kod w Pythonie!</p>
+              <p className="text-indigo-400/80 text-sm mt-1">Przeszedłeś wszystkie poziomy. Jesteś gotowy pisać prawdziwy kod w Pythonie!</p>
             </div>
           )}
           {executionTime !== null && (
