@@ -1,0 +1,4 @@
+flask==3.1.*
+PyLTI1p3==2.0.*
+PyJWT==2.10.*
+cryptography==44.*
