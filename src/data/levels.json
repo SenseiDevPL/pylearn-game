@@ -1466,5 +1466,184 @@
       "Błąd 2: wrzesień to 2026-09, a nie 2026-08.",
       "Błąd 3: od najlepszego = sort_values(ascending=False)."
     ]
+  },
+  {
+    "id": 71,
+    "title": "Porządek w folderze",
+    "description": "Automatyzacja nudnej roboty: w folderze leży bałagan — faktury, zdjęcia i dokumenty razem. NOWOŚĆ: os.listdir(\".\") daje listę plików w folderze, os.path.splitext(plik)[1] wyciąga rozszerzenie (np. \".pdf\"), os.makedirs(folder, exist_ok=True) tworzy folder, a shutil.move(plik, cel) przenosi plik. Ten sam kod posprząta na twoim komputerze nawet 10 000 plików w sekundę.",
+    "objective": "Przenieś każdy plik do folderu według rozszerzenia (słownik foldery) i wypisz: Przeniesiono 6 plików",
+    "starterCode": "import os\nimport shutil\n\n# Jaki folder dla jakiego rodzaju pliku:\nfoldery = {\".pdf\": \"Faktury\", \".jpg\": \"Zdjecia\", \".png\": \"Zdjecia\", \".docx\": \"Dokumenty\", \".txt\": \"Dokumenty\"}\n\n# Twój kod: dla każdego pliku sprawdź rozszerzenie i przenieś go do właściwego folderu\n",
+    "solution": "import os\nimport shutil\n\n# Jaki folder dla jakiego rodzaju pliku:\nfoldery = {\".pdf\": \"Faktury\", \".jpg\": \"Zdjecia\", \".png\": \"Zdjecia\", \".docx\": \"Dokumenty\", \".txt\": \"Dokumenty\"}\n\nprzeniesione = 0\nfor plik in os.listdir(\".\"):\n    rozszerzenie = os.path.splitext(plik)[1]\n    if rozszerzenie in foldery:\n        cel = foldery[rozszerzenie]\n        os.makedirs(cel, exist_ok=True)\n        shutil.move(plik, os.path.join(cel, plik))\n        przeniesione += 1\nprint(f\"Przeniesiono {przeniesione} plików\")\n",
+    "expectedCommands": [],
+    "files": {"faktura_lipiec.pdf": "PDF", "faktura_sierpien.pdf": "PDF", "wakacje.jpg": "JPG", "logo.png": "PNG", "umowa.docx": "DOCX", "notatki.txt": "notatki"},
+    "expectedFiles": ["Dokumenty/notatki.txt", "Dokumenty/umowa.docx", "Faktury/faktura_lipiec.pdf", "Faktury/faktura_sierpien.pdf", "Zdjecia/logo.png", "Zdjecia/wakacje.jpg"],
+    "expectedOutput": "Przeniesiono 6 plików",
+    "hints": [
+      "for plik in os.listdir(\".\"): — potem rozszerzenie = os.path.splitext(plik)[1]",
+      "if rozszerzenie in foldery: cel = foldery[rozszerzenie], os.makedirs(cel, exist_ok=True)",
+      "shutil.move(plik, os.path.join(cel, plik)) i przeniesione += 1"
+    ]
+  },
+  {
+    "id": 72,
+    "title": "Zmiana nazw zdjęć",
+    "description": "Aparat nazywa zdjęcia IMG_4821.jpg — nic z tego nie wiadomo. NOWOŚĆ: os.rename(stara, nowa) zmienia nazwę pliku. enumerate(lista, start=1) numeruje elementy: daje pary (1, pierwszy), (2, drugi)… A f\"{numer:02d}\" dopisuje zero z przodu: 1 → 01. Inne pliki (opis.txt) mają zostać nietknięte.",
+    "objective": "Zmień nazwy wszystkich zdjęć .jpg (w kolejności alfabetycznej) na wycieczka_01.jpg, wycieczka_02.jpg… i wypisz każdą zmianę: stara -> nowa",
+    "starterCode": "import os\n\n# 1. zbierz posortowaną listę plików .jpg\n# 2. ponumeruj je (enumerate) i zmień nazwy (os.rename)\n",
+    "solution": "import os\n\nzdjecia = []\nfor plik in sorted(os.listdir(\".\")):\n    if plik.endswith(\".jpg\"):\n        zdjecia.append(plik)\nfor numer, stara in enumerate(zdjecia, start=1):\n    nowa = f\"wycieczka_{numer:02d}.jpg\"\n    os.rename(stara, nowa)\n    print(f\"{stara} -> {nowa}\")\n",
+    "expectedCommands": [],
+    "files": {"IMG_4821.jpg": "x", "IMG_4822.jpg": "x", "IMG_4830.jpg": "x", "IMG_4833.jpg": "x", "opis.txt": "Wycieczka do Zakopanego"},
+    "expectedFiles": ["opis.txt", "wycieczka_01.jpg", "wycieczka_02.jpg", "wycieczka_03.jpg", "wycieczka_04.jpg"],
+    "requires": { "pattern": "enumerate\\(", "message": "ponumeruj zdjęcia przez enumerate(zdjecia, start=1)." },
+    "expectedOutput": "IMG_4821.jpg -> wycieczka_01.jpg\nIMG_4822.jpg -> wycieczka_02.jpg\nIMG_4830.jpg -> wycieczka_03.jpg\nIMG_4833.jpg -> wycieczka_04.jpg",
+    "hints": [
+      "Lista zdjęć: for plik in sorted(os.listdir(\".\")): if plik.endswith(\".jpg\"): zdjecia.append(plik)",
+      "for numer, stara in enumerate(zdjecia, start=1):",
+      "nowa = f\"wycieczka_{numer:02d}.jpg\", potem os.rename(stara, nowa)"
+    ]
+  },
+  {
+    "id": 73,
+    "title": "Wiele plików w jeden raport",
+    "description": "Co miesiąc przychodzi nowy plik CSV, a szef chce jedno podsumowanie. NOWOŚĆ: pathlib. Path(\"raporty\").glob(\"*.csv\") znajduje wszystkie pliki .csv w folderze (gwiazdka = cokolwiek). plik.name to sama nazwa pliku. open(\"plik.txt\", \"w\") tworzy nowy plik do zapisu, a f.write(tekst) wpisuje do niego tekst.",
+    "objective": "Zsumuj kwoty z każdego pliku CSV w folderze raporty, wypisz sumę każdego pliku i zapisz plik podsumowanie.txt z treścią: Razem: 1350 zł",
+    "starterCode": "from pathlib import Path\nimport csv\n\n# 1. dla każdego pliku raporty/*.csv policz sumę kolumny kwota i wypisz: sprzedaz_07.csv: 350 zł\n# 2. zapisz podsumowanie.txt z treścią: Razem: ... zł\n",
+    "solution": "from pathlib import Path\nimport csv\n\nrazem = 0\nfor plik in sorted(Path(\"raporty\").glob(\"*.csv\")):\n    suma = 0\n    with open(plik, encoding=\"utf-8\") as f:\n        for wiersz in csv.DictReader(f):\n            suma += int(wiersz[\"kwota\"])\n    print(f\"{plik.name}: {suma} zł\")\n    razem += suma\nwith open(\"podsumowanie.txt\", \"w\", encoding=\"utf-8\") as f:\n    f.write(f\"Razem: {razem} zł\\n\")\n",
+    "expectedCommands": [],
+    "files": {"raporty/sprzedaz_07.csv": "dzien,kwota\n1,100\n2,250\n", "raporty/sprzedaz_08.csv": "dzien,kwota\n1,300\n2,200\n3,100\n", "raporty/sprzedaz_09.csv": "dzien,kwota\n1,400\n", "raporty/notatka.txt": "nie liczyć"},
+    "expectedFiles": ["podsumowanie.txt", "raporty/notatka.txt", "raporty/sprzedaz_07.csv", "raporty/sprzedaz_08.csv", "raporty/sprzedaz_09.csv"],
+    "expectedFileContents": {"podsumowanie.txt": "Razem: 1350 zł"},
+    "requires": { "pattern": "glob\\(", "message": "znajdź pliki przez Path(\"raporty\").glob(\"*.csv\")." },
+    "expectedOutput": "sprzedaz_07.csv: 350 zł\nsprzedaz_08.csv: 600 zł\nsprzedaz_09.csv: 400 zł",
+    "hints": [
+      "for plik in sorted(Path(\"raporty\").glob(\"*.csv\")):",
+      "W środku: with open(plik, encoding=\"utf-8\") as f: for wiersz in csv.DictReader(f): suma += int(wiersz[\"kwota\"])",
+      "Na końcu: with open(\"podsumowanie.txt\", \"w\", encoding=\"utf-8\") as f: f.write(f\"Razem: {razem} zł\\n\")"
+    ]
+  },
+  {
+    "id": 74,
+    "title": "Pierwszy mail z Pythona",
+    "description": "Python wysyła maile — raporty, przypomnienia, potwierdzenia. NOWOŚĆ: EmailMessage to koperta: msg[\"To\"], msg[\"Subject\"], msg.set_content(treść). smtplib.SMTP łączy się z serwerem poczty, starttls() szyfruje połączenie, login() loguje, send_message(msg) wysyła. Hasło nigdy nie jest wpisane w kod — bierzesz je ze „zmiennych środowiskowych” serwera: os.environ[\"SMTP_HASLO\"]. W grze serwer jest udawany i nic nie wychodzi do internetu.",
+    "objective": "Wyślij do szef@firma.pl mail z tematem Raport tygodniowy (treść dowolna), a potem wypisz: Wysłano",
+    "starterCode": "import os\nimport smtplib\nfrom email.message import EmailMessage\n\n# 1. przygotuj kopertę: From biuro@firma.pl, To szef@firma.pl, Subject Raport tygodniowy, treść\n# 2. połącz się: smtplib.SMTP(\"smtp.firma.pl\", 587), starttls, login, send_message\n# 3. wypisz: Wysłano\n",
+    "solution": "import os\nimport smtplib\nfrom email.message import EmailMessage\n\nmsg = EmailMessage()\nmsg[\"From\"] = \"biuro@firma.pl\"\nmsg[\"To\"] = \"szef@firma.pl\"\nmsg[\"Subject\"] = \"Raport tygodniowy\"\nmsg.set_content(\"Dzień dobry, sprzedaż w tym tygodniu: 6000 zł.\")\n\nwith smtplib.SMTP(\"smtp.firma.pl\", 587) as serwer:\n    serwer.starttls()\n    serwer.login(\"biuro@firma.pl\", os.environ[\"SMTP_HASLO\"])\n    serwer.send_message(msg)\nprint(\"Wysłano\")\n",
+    "expectedCommands": [],
+    "env": {"SMTP_HASLO": "haslo-z-sejfu-serwera"},
+    "expectedOutbox": ["szef@firma.pl | Raport tygodniowy"],
+    "expectedOutput": "Wysłano",
+    "hints": [
+      "msg = EmailMessage(), potem msg[\"To\"] = \"szef@firma.pl\" i msg[\"Subject\"] = \"Raport tygodniowy\"",
+      "msg.set_content(\"...\") — treść dowolna",
+      "with smtplib.SMTP(\"smtp.firma.pl\", 587) as serwer: starttls(), login(\"biuro@firma.pl\", os.environ[\"SMTP_HASLO\"]), send_message(msg)"
+    ]
+  },
+  {
+    "id": 75,
+    "title": "Mail seryjny: przypomnienia o płatności",
+    "description": "Zamiast pisać 50 maili ręcznie, Python wyśle każdemu klientowi jego własny — z imieniem i kwotą (to tzw. korespondencja seryjna). Dla KAŻDEGO odbiorcy tworzysz NOWĄ kopertę EmailMessage w pętli. Jedno połączenie z serwerem wystarczy na wszystkie maile.",
+    "objective": "Wyślij każdemu dłużnikowi osobny mail z tematem Przypomnienie: numer faktury i treścią z imieniem i kwotą. Po każdym wypisz: Wysłano do adres",
+    "starterCode": "import os\nimport csv\nimport io\nimport smtplib\nfrom email.message import EmailMessage\n\ndluznicy = \"\"\"email,imie,faktura,kwota\njan@klient.pl,Jan,FV/02,850\nola@klient.pl,Ola,FV/04,430\n\"\"\"\n\n# Dla każdego wiersza: nowa koperta, temat f\"Przypomnienie: {faktura}\", treść z imieniem i kwotą\n",
+    "solution": "import os\nimport csv\nimport io\nimport smtplib\nfrom email.message import EmailMessage\n\ndluznicy = \"\"\"email,imie,faktura,kwota\njan@klient.pl,Jan,FV/02,850\nola@klient.pl,Ola,FV/04,430\n\"\"\"\n\nwith smtplib.SMTP(\"smtp.firma.pl\", 587) as serwer:\n    serwer.starttls()\n    serwer.login(\"biuro@firma.pl\", os.environ[\"SMTP_HASLO\"])\n    for d in csv.DictReader(io.StringIO(dluznicy)):\n        msg = EmailMessage()\n        msg[\"From\"] = \"biuro@firma.pl\"\n        msg[\"To\"] = d[\"email\"]\n        msg[\"Subject\"] = f\"Przypomnienie: {d['faktura']}\"\n        msg.set_content(f\"Dzień dobry {d['imie']}, przypominamy o zapłacie {d['kwota']} zł za {d['faktura']}.\")\n        serwer.send_message(msg)\n        print(f\"Wysłano do {d['email']}\")\n",
+    "expectedCommands": [],
+    "env": {"SMTP_HASLO": "haslo-z-sejfu-serwera"},
+    "expectedOutbox": ["jan@klient.pl | Przypomnienie: FV/02", "ola@klient.pl | Przypomnienie: FV/04"],
+    "preview": {"title": "Dłużnicy", "columns": ["email", "imie", "faktura", "kwota"], "rows": [["jan@klient.pl", "Jan", "FV/02", "850"], ["ola@klient.pl", "Ola", "FV/04", "430"]]},
+    "expectedOutput": "Wysłano do jan@klient.pl\nWysłano do ola@klient.pl",
+    "hints": [
+      "Połącz się raz: with smtplib.SMTP(...) as serwer: starttls() i login(...)",
+      "W środku pętla: for d in csv.DictReader(io.StringIO(dluznicy)): i NOWA koperta msg = EmailMessage()",
+      "msg[\"To\"] = d[\"email\"], msg[\"Subject\"] = f\"Przypomnienie: {d['faktura']}\", potem serwer.send_message(msg)"
+    ]
+  },
+  {
+    "id": 76,
+    "title": "Mail z załącznikiem",
+    "description": "Księgowość chce plik, a nie opis. NOWOŚĆ: msg.add_attachment(dane, maintype=\"text\", subtype=\"csv\", filename=\"nazwa.csv\") dołącza plik do maila. Plik czytasz w trybie bajtowym: open(nazwa, \"rb\") — tak działa każdy załącznik, także PDF czy zdjęcie.",
+    "objective": "Wyślij do ksiegowosc@firma.pl mail z tematem Sprzedaż wrzesień i załącznikiem sprzedaz_wrzesien.csv.",
+    "starterCode": "import os\nimport smtplib\nfrom email.message import EmailMessage\n\n# 1. koperta do ksiegowosc@firma.pl, temat: Sprzedaż wrzesień\n# 2. przeczytaj plik sprzedaz_wrzesien.csv (\"rb\") i dołącz go\n# 3. wyślij\n",
+    "solution": "import os\nimport smtplib\nfrom email.message import EmailMessage\n\nmsg = EmailMessage()\nmsg[\"From\"] = \"biuro@firma.pl\"\nmsg[\"To\"] = \"ksiegowosc@firma.pl\"\nmsg[\"Subject\"] = \"Sprzedaż wrzesień\"\nmsg.set_content(\"W załączniku sprzedaż za wrzesień.\")\nwith open(\"sprzedaz_wrzesien.csv\", \"rb\") as f:\n    msg.add_attachment(f.read(), maintype=\"text\", subtype=\"csv\", filename=\"sprzedaz_wrzesien.csv\")\n\nwith smtplib.SMTP(\"smtp.firma.pl\", 587) as serwer:\n    serwer.starttls()\n    serwer.login(\"biuro@firma.pl\", os.environ[\"SMTP_HASLO\"])\n    serwer.send_message(msg)\n",
+    "expectedCommands": [],
+    "files": {"sprzedaz_wrzesien.csv": "data,kwota\n2026-09-10,2100\n2026-09-28,900\n"},
+    "env": {"SMTP_HASLO": "haslo-z-sejfu-serwera"},
+    "expectedFiles": ["sprzedaz_wrzesien.csv"],
+    "expectedOutbox": ["ksiegowosc@firma.pl | Sprzedaż wrzesień | 📎 sprzedaz_wrzesien.csv"],
+    "hints": [
+      "Koperta jak w misji 74, tylko inny adresat i temat.",
+      "with open(\"sprzedaz_wrzesien.csv\", \"rb\") as f: msg.add_attachment(f.read(), maintype=\"text\", subtype=\"csv\", filename=\"sprzedaz_wrzesien.csv\")",
+      "Wyślij tak samo jak w misji 74."
+    ]
+  },
+  {
+    "id": 77,
+    "title": "AI kasuje za dużo",
+    "ai": true,
+    "description": "Kasowanie plików jest NIEODWRACALNE — nie ma kosza. AI miało usunąć tylko pliki tymczasowe .tmp, ale odwróciło warunek i kasuje wszystko POZA nimi. Zasada kontrolera: kod, który kasuje, najpierw uruchom „na sucho” — tylko z print, bez os.remove — i sprawdź listę.",
+    "objective": "Uruchom, zobacz, co zostało w folderze, i popraw warunek tak, żeby znikały tylko pliki .tmp. (Folder wraca do stanu początkowego przy każdym uruchomieniu.)",
+    "starterCode": "import os\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"usuń pliki tymczasowe .tmp\"\n# Odpowiedź AI: \"Posprzątane!\"\nfor plik in sorted(os.listdir(\".\")):\n    if not plik.endswith(\".tmp\"):\n        os.remove(plik)\n        print(f\"Usunięto {plik}\")\n",
+    "solution": "import os\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"usuń pliki tymczasowe .tmp\"\n# Odpowiedź AI: \"Posprzątane!\"\nfor plik in sorted(os.listdir(\".\")):\n    if plik.endswith(\".tmp\"):\n        os.remove(plik)\n        print(f\"Usunięto {plik}\")\n",
+    "expectedCommands": [],
+    "files": {"raport.docx": "ważny", "faktura.pdf": "ważna", "zdjecie.jpg": "ważne", "~temp1.tmp": "śmieć", "cache.tmp": "śmieć"},
+    "expectedFiles": ["faktura.pdf", "raport.docx", "zdjecie.jpg"],
+    "hints": [
+      "Popatrz na folder po uruchomieniu: co zostało, a co zniknęło?",
+      "not odwraca warunek: „jeśli NIE kończy się na .tmp”.",
+      "Usuń słowo not."
+    ]
+  },
+  {
+    "id": 78,
+    "title": "Hasło do poczty w kodzie",
+    "ai": true,
+    "description": "Bezpieczeństwo: AI wpisało hasło do poczty prosto w kod. Kod trafia do repozytorium, maili, czatów — i hasło razem z nim. Do tego hasło jest stare: administrator je zmienił, więc serwer odmawia. Hasło zawsze bierze się ze zmiennych środowiskowych: os.environ[\"SMTP_HASLO\"].",
+    "objective": "Uruchom, przeczytaj błąd i popraw logowanie tak, żeby hasło nie było wpisane w kod.",
+    "starterCode": "import os\nimport smtplib\nfrom email.message import EmailMessage\n\nmsg = EmailMessage()\nmsg[\"From\"] = \"biuro@firma.pl\"\nmsg[\"To\"] = \"szef@firma.pl\"\nmsg[\"Subject\"] = \"Raport dzienny\"\nmsg.set_content(\"Wszystko w porządku.\")\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"wyślij raport dzienny\"\n# Odpowiedź AI: \"Wpisałem hasło, żeby działało od razu\"\nwith smtplib.SMTP(\"smtp.firma.pl\", 587) as serwer:\n    serwer.starttls()\n    serwer.login(\"biuro@firma.pl\", \"Haslo123!\")\n    serwer.send_message(msg)\n",
+    "solution": "import os\nimport smtplib\nfrom email.message import EmailMessage\n\nmsg = EmailMessage()\nmsg[\"From\"] = \"biuro@firma.pl\"\nmsg[\"To\"] = \"szef@firma.pl\"\nmsg[\"Subject\"] = \"Raport dzienny\"\nmsg.set_content(\"Wszystko w porządku.\")\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"wyślij raport dzienny\"\n# Odpowiedź AI: \"Wpisałem hasło, żeby działało od razu\"\nwith smtplib.SMTP(\"smtp.firma.pl\", 587) as serwer:\n    serwer.starttls()\n    serwer.login(\"biuro@firma.pl\", os.environ[\"SMTP_HASLO\"])\n    serwer.send_message(msg)\n",
+    "expectedCommands": [],
+    "env": {"SMTP_HASLO": "haslo-z-sejfu-serwera"},
+    "expectedOutbox": ["szef@firma.pl | Raport dzienny"],
+    "requires": { "pattern": "^(?![\\s\\S]*[\\\"']Haslo123!)", "message": "hasło nie może być wpisane w kod — weź je z os.environ[\"SMTP_HASLO\"]." },
+    "hints": [
+      "Serwer odrzucił hasło — jest stare, i do tego wpisane w kod.",
+      "Prawdziwe hasło jest w os.environ[\"SMTP_HASLO\"].",
+      "serwer.login(\"biuro@firma.pl\", os.environ[\"SMTP_HASLO\"])"
+    ]
+  },
+  {
+    "id": 79,
+    "title": "Wszyscy w jednym mailu",
+    "ai": true,
+    "description": "RODO: AI wysłało ofertę jednym mailem do wszystkich klientów naraz — w polu „Do” każdy widzi adresy wszystkich pozostałych. To wyciek danych osobowych, za który firmy płacą kary. Każdy klient ma dostać osobny mail.",
+    "objective": "Zobacz, co wysłało AI, i popraw tak, żeby każdy klient dostał osobny mail z tematem Nowa oferta.",
+    "starterCode": "import os\nimport smtplib\nfrom email.message import EmailMessage\n\nklienci = [\"anna@przyklad.pl\", \"jan@przyklad.pl\", \"ewa@przyklad.pl\"]\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"wyślij klientom nową ofertę\"\n# Odpowiedź AI: \"Wysłałem wszystkim jednym mailem, szybciej!\"\nmsg = EmailMessage()\nmsg[\"From\"] = \"biuro@firma.pl\"\nmsg[\"To\"] = \", \".join(klienci)\nmsg[\"Subject\"] = \"Nowa oferta\"\nmsg.set_content(\"Mamy dla Ciebie nową ofertę!\")\nwith smtplib.SMTP(\"smtp.firma.pl\", 587) as serwer:\n    serwer.starttls()\n    serwer.login(\"biuro@firma.pl\", os.environ[\"SMTP_HASLO\"])\n    serwer.send_message(msg)\n",
+    "solution": "import os\nimport smtplib\nfrom email.message import EmailMessage\n\nklienci = [\"anna@przyklad.pl\", \"jan@przyklad.pl\", \"ewa@przyklad.pl\"]\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"wyślij klientom nową ofertę\"\n# Odpowiedź AI: \"Wysłałem wszystkim jednym mailem, szybciej!\"\nwith smtplib.SMTP(\"smtp.firma.pl\", 587) as serwer:\n    serwer.starttls()\n    serwer.login(\"biuro@firma.pl\", os.environ[\"SMTP_HASLO\"])\n    for klient in klienci:\n        msg = EmailMessage()\n        msg[\"From\"] = \"biuro@firma.pl\"\n        msg[\"To\"] = klient\n        msg[\"Subject\"] = \"Nowa oferta\"\n        msg.set_content(\"Mamy dla Ciebie nową ofertę!\")\n        serwer.send_message(msg)\n",
+    "expectedCommands": [],
+    "env": {"SMTP_HASLO": "haslo-z-sejfu-serwera"},
+    "expectedOutbox": ["anna@przyklad.pl | Nowa oferta", "jan@przyklad.pl | Nowa oferta", "ewa@przyklad.pl | Nowa oferta"],
+    "hints": [
+      "Popatrz na „Wysłane”: ile maili poszło i kto jest w polu „Do”?",
+      "Potrzebna pętla for klient in klienci: — w środku NOWA koperta dla każdego.",
+      "Przenieś tworzenie msg i send_message do środka pętli, w bloku with."
+    ]
+  },
+  {
+    "id": 80,
+    "title": "Wielki finał: automat do raportów",
+    "ai": true,
+    "description": "Finał: AI zbudowało automat, który co miesiąc zbiera raporty z plików, liczy sumę, zapisuje podsumowanie i wysyła je szefowi (szef@firma.pl) jako załącznik. AI mówi „przetestowałem, działa”, a w kodzie są trzy błędy: literówka w szukaniu plików, zmyślona funkcja do załączników i zły adres. Poprawiaj po jednym i uruchamiaj po każdej poprawce.",
+    "objective": "Podsumowanie ma zawierać Razem: 1350 zł i trafić jako załącznik do szef@firma.pl. Znajdź i popraw 3 błędy AI.",
+    "starterCode": "import os\nimport smtplib\nimport csv\nfrom pathlib import Path\nfrom email.message import EmailMessage\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zsumuj raporty z folderu, zapisz podsumowanie i wyślij je szefowi (szef@firma.pl)\"\n# Odpowiedź AI: \"Przetestowałem, działa!\"\nrazem = 0\nfor plik in Path(\"raporty\").glob(\"*.cvs\"):\n    with open(plik, encoding=\"utf-8\") as f:\n        for wiersz in csv.DictReader(f):\n            razem += int(wiersz[\"kwota\"])\nwith open(\"podsumowanie.txt\", \"w\", encoding=\"utf-8\") as f:\n    f.write(f\"Razem: {razem} zł\\n\")\n\nmsg = EmailMessage()\nmsg[\"From\"] = \"biuro@firma.pl\"\nmsg[\"To\"] = \"szef@firma.com\"\nmsg[\"Subject\"] = \"Podsumowanie miesiąca\"\nmsg.set_content(\"W załączniku podsumowanie.\")\nmsg.attach_file(\"podsumowanie.txt\")\n\nwith smtplib.SMTP(\"smtp.firma.pl\", 587) as serwer:\n    serwer.starttls()\n    serwer.login(\"biuro@firma.pl\", os.environ[\"SMTP_HASLO\"])\n    serwer.send_message(msg)\n",
+    "solution": "import os\nimport smtplib\nimport csv\nfrom pathlib import Path\nfrom email.message import EmailMessage\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zsumuj raporty z folderu, zapisz podsumowanie i wyślij je szefowi (szef@firma.pl)\"\n# Odpowiedź AI: \"Przetestowałem, działa!\"\nrazem = 0\nfor plik in Path(\"raporty\").glob(\"*.csv\"):\n    with open(plik, encoding=\"utf-8\") as f:\n        for wiersz in csv.DictReader(f):\n            razem += int(wiersz[\"kwota\"])\nwith open(\"podsumowanie.txt\", \"w\", encoding=\"utf-8\") as f:\n    f.write(f\"Razem: {razem} zł\\n\")\n\nmsg = EmailMessage()\nmsg[\"From\"] = \"biuro@firma.pl\"\nmsg[\"To\"] = \"szef@firma.pl\"\nmsg[\"Subject\"] = \"Podsumowanie miesiąca\"\nmsg.set_content(\"W załączniku podsumowanie.\")\nwith open(\"podsumowanie.txt\", \"rb\") as f:\n    msg.add_attachment(f.read(), maintype=\"text\", subtype=\"plain\", filename=\"podsumowanie.txt\")\n\nwith smtplib.SMTP(\"smtp.firma.pl\", 587) as serwer:\n    serwer.starttls()\n    serwer.login(\"biuro@firma.pl\", os.environ[\"SMTP_HASLO\"])\n    serwer.send_message(msg)\n",
+    "expectedCommands": [],
+    "files": {"raporty/sprzedaz_07.csv": "dzien,kwota\n1,100\n2,250\n", "raporty/sprzedaz_08.csv": "dzien,kwota\n1,300\n2,200\n3,100\n", "raporty/sprzedaz_09.csv": "dzien,kwota\n1,400\n", "raporty/notatka.txt": "nie liczyć"},
+    "env": {"SMTP_HASLO": "haslo-z-sejfu-serwera"},
+    "expectedFiles": ["podsumowanie.txt", "raporty/notatka.txt", "raporty/sprzedaz_07.csv", "raporty/sprzedaz_08.csv", "raporty/sprzedaz_09.csv"],
+    "expectedFileContents": {"podsumowanie.txt": "Razem: 1350 zł"},
+    "expectedOutbox": ["szef@firma.pl | Podsumowanie miesiąca | 📎 podsumowanie.txt"],
+    "hints": [
+      "Błąd 1: EmailMessage nie ma attach_file — prawdziwa funkcja to add_attachment (jak w misji 76).",
+      "Błąd 2: podsumowanie pokazuje 0 zł — zajrzyj do glob: *.cvs to literówka, pliki mają rozszerzenie .csv.",
+      "Błąd 3: szef ma adres szef@firma.pl, a nie .com."
+    ]
   }
 ]

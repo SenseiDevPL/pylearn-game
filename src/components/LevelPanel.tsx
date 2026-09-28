@@ -21,7 +21,7 @@ export function LevelPanel({ level, currentHint, onShowHint, onShowSolution, sho
         <div className="mb-3 bg-amber-950/40 rounded-lg px-3 py-2 border border-amber-700/50">
           <span className="text-amber-300 text-xs font-semibold uppercase tracking-wider">💼 Python w pracy</span>
           <p className="text-amber-100/90 text-sm mt-0.5">
-            Bez planszy — prawdziwe zadanie z pracy biurowej. Liczy się to, co twój kod wypisze w konsoli.
+            Bez planszy — prawdziwe zadanie z pracy biurowej. Liczy się wynik: to, co kod wypisze, zrobi z plikami albo wyśle mailem.
           </p>
         </div>
       )}
@@ -31,7 +31,7 @@ export function LevelPanel({ level, currentHint, onShowHint, onShowSolution, sho
           <p className="text-violet-200/90 text-sm mt-0.5">
             {level.grid
               ? 'Kod w edytorze napisał asystent AI. Uruchom go, obserwuj ludzika, znajdź błąd AI i popraw.'
-              : 'Kod w edytorze napisał asystent AI. Uruchom go, sprawdź wynik w konsoli, znajdź błąd AI i popraw.'}
+              : 'Kod w edytorze napisał asystent AI. Uruchom go, sprawdź wynik, znajdź błąd AI i popraw.'}
           </p>
         </div>
       )}

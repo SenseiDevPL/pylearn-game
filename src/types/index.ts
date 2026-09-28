@@ -17,6 +17,15 @@ export interface Level {
   packages?: string[]
   /** Table shown where the board would be, so the student sees the data they work on. */
   preview?: { title: string; columns: string[]; rows: (string | number)[][] }
+  /** Files (path → content) put into a fresh work folder before every run. */
+  files?: Record<string, string>
+  /** Environment variables for the run, e.g. the mail password. */
+  env?: Record<string, string>
+  /** Every file the folder must contain after the run. */
+  expectedFiles?: string[]
+  expectedFileContents?: Record<string, string>
+  /** Sent mail, one line each: "to | subject" (+ " | 📎 attachments"). */
+  expectedOutbox?: string[]
   /** Missing grid = a "Python w pracy" task: no board, judged by console output. */
   grid?: {
     width: number
@@ -36,6 +45,11 @@ export interface ExecutionResult {
   executionTime: number
   /** PNG (base64) of a matplotlib chart the code drew, if any. */
   image?: string
+  /** Work folder after the run (paths), when the level has one. */
+  files?: string[] | null
+  outbox?: string[]
+  /** Unmet file/mail expectations, in Polish. */
+  problems?: string[]
 }
 
 export interface GameCommand {

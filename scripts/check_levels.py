@@ -6,17 +6,30 @@ Runs the same bridge.py the game runs in Pyodide. Usage:
 import json
 import pathlib
 import re
+import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-BRIDGE = (ROOT / "src/workers/bridge.py").read_text()
+BRIDGE = (ROOT / "src/workers/bridge.py").read_text() + "\n" + (ROOT / "src/workers/office.py").read_text()
 LEVELS = json.loads((ROOT / "src/data/levels.json").read_text())
 
 
 NO_BOARD = {"width": 1, "height": 1, "playerStart": {"x": 0, "y": 0}, "goal": {"x": 0, "y": 0}, "walls": [], "items": []}
 
 
+WORKDIR = tempfile.mkdtemp(prefix="pylearn-check-") + "/praca"
+
+
+def setup_of(level):
+    s = {"env": level.get("env", {}), "expectedFileContents": level.get("expectedFileContents", {})}
+    for key in ("files", "expectedFiles", "expectedOutbox"):
+        if key in level:
+            s[key] = level[key]
+    return s
+
+
 def run(level, code):
-    env = {"_LEVEL_JSON": json.dumps(level.get("grid", NO_BOARD)), "_level_id": level["id"]}
+    env = {"_LEVEL_JSON": json.dumps(level.get("grid", NO_BOARD)), "_level_id": level["id"],
+           "_SETUP_JSON": json.dumps(setup_of(level)), "_WORKDIR": WORKDIR}
     try:
         exec(BRIDGE + f"\n_run({json.dumps(code, ensure_ascii=False)})\n", env)
     except Exception as e:  # the game shows these as errors
@@ -27,6 +40,9 @@ def run(level, code):
         exp, req = level.get("expectedOutput"), level.get("requires")
         if exp is not None and output.strip() != exp:
             return "output", repr(output[:80]), output
+        problems = env["_verify"]()
+        if problems:
+            return "problems", " / ".join(problems)[:120], output
         if req and not re.search(req["pattern"], code):
             return "requires", req["message"], output
         return "win", "", output

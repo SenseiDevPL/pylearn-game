@@ -3,6 +3,7 @@
 import type { ExecutionResult, GameCommand, Level, WorkerMessage, WorkerResponse } from '../types/index.ts'
 import levelsData from '../data/levels.json'
 import bridgeSource from './bridge.py?raw'
+import officeSource from './office.py?raw'
 
 declare const self: DedicatedWorkerGlobalScope
 
@@ -52,8 +53,21 @@ async function ensurePackages(names: string[]) {
 // bridge.py defines `player` and simulates the board; it reads the level's
 // grid from _LEVEL_JSON (a JSON string is also a valid Python string literal).
 function buildPythonBridge(levelId: number): string {
-  const grid = levels.find((l) => l.id === levelId)?.grid ?? NO_BOARD
-  return `_LEVEL_JSON = ${JSON.stringify(JSON.stringify(grid))}\n_level_id = ${levelId}\n` + bridgeSource
+  const level = levels.find((l) => l.id === levelId)
+  const setup = {
+    ...(level?.files && { files: level.files }),
+    env: level?.env ?? {},
+    ...(level?.expectedFiles && { expectedFiles: level.expectedFiles }),
+    expectedFileContents: level?.expectedFileContents ?? {},
+    ...(level?.expectedOutbox && { expectedOutbox: level.expectedOutbox }),
+  }
+  return (
+    `_LEVEL_JSON = ${JSON.stringify(JSON.stringify(level?.grid ?? NO_BOARD))}\n_level_id = ${levelId}\n` +
+    `_SETUP_JSON = ${JSON.stringify(JSON.stringify(setup))}\n_WORKDIR = "/home/pyodide/praca"\n` +
+    bridgeSource +
+    '\n' +
+    officeSource
+  )
 }
 
 const RESULT_EXTRACTOR = `
@@ -69,7 +83,10 @@ if "matplotlib.pyplot" in _sys.modules:
 _json.dumps({
     "commands": _commands,
     "output": "\\n".join(_output_lines),
-    "image": _image
+    "image": _image,
+    "files": _workspace_files(),
+    "outbox": [_mail_line(m) for m in _outbox],
+    "problems": _verify()
 })
 `
 
@@ -89,6 +106,10 @@ function explainPythonError(raw: string, fallback: string): string {
     return `Nie znam nazwy ${m[1]} — literówka albo zmienna nie została utworzona.`
   if (/_TOO_MANY_COMMANDS/.test(last))
     return 'Za dużo ruchów (ponad 1000) — prawdopodobnie pętla, która nigdy się nie kończy.'
+  if (/SMTPAuthenticationError/.test(last))
+    return 'Serwer poczty odrzucił login albo hasło — hasło jest złe albo nieaktualne.'
+  if ((m = last.match(/FileNotFoundError: .*?'([^']+)'/)))
+    return `Nie ma takiego pliku ani folderu: ${m[1]} — sprawdź nazwę i to, gdzie on leży.`
   if (/IndentationError/.test(last))
     return 'Złe wcięcie — linijki w środku pętli, if albo funkcji muszą mieć tyle samo spacji na początku.'
   if (/SyntaxError/.test(last))
@@ -123,6 +144,9 @@ async function executeCode(code: string, levelId: number): Promise<ExecutionResu
       commands: GameCommand[]
       output: string
       image: string
+      files: string[] | null
+      outbox: string[]
+      problems: string[]
     }
 
     const executionTime = performance.now() - startTime
@@ -134,6 +158,9 @@ async function executeCode(code: string, levelId: number): Promise<ExecutionResu
       commands: parsed.commands,
       executionTime,
       image: parsed.image || undefined,
+      files: parsed.files,
+      outbox: parsed.outbox,
+      problems: parsed.problems,
     }
   } catch (err) {
     const executionTime = performance.now() - startTime

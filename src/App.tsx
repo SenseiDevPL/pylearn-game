@@ -22,6 +22,8 @@ export default function App() {
   const [hintCount, setHintCount] = useState(0)
   const [showingSolution, setShowingSolution] = useState(false)
   const [image, setImage] = useState<string | null>(null)
+  const [folder, setFolder] = useState<string[] | null>(null)
+  const [outbox, setOutbox] = useState<string[]>([])
 
   const currentLevel = levels[currentLevelIdx]
   const isWorkTask = !currentLevel.grid
@@ -36,6 +38,8 @@ export default function App() {
     setHintCount(0)
     setShowingSolution(false)
     setImage(null)
+    setFolder(null)
+    setOutbox([])
   }, [currentLevel])
 
   const handleRun = useCallback(async () => {
@@ -50,6 +54,8 @@ export default function App() {
     try {
       const result = await execute(code, currentLevel.id)
       setImage(result.image ?? null)
+      setFolder(result.files ?? null)
+      setOutbox(result.outbox ?? [])
 
       if (!result.success) {
         setGameState('failure')
@@ -68,6 +74,9 @@ export default function App() {
         if (expected !== undefined && result.output.trim() !== expected) {
           setGameState('failure')
           setError(`W konsoli miało się wypisać:\n${expected}`)
+        } else if (result.problems?.length) {
+          setGameState('failure')
+          setError(result.problems.join('\n\n'))
         } else if (req && !new RegExp(req.pattern).test(code)) {
           setGameState('failure')
           setError(`Wynik się zgadza, ale zadanie było inne: ${req.message}`)
@@ -135,6 +144,8 @@ export default function App() {
     setOutput('')
     setShowingSolution(false)
     setImage(null)
+    setFolder(null)
+    setOutbox([])
     gameRef.current?.resetLevel()
   }, [currentLevel])
 
@@ -193,7 +204,33 @@ export default function App() {
           </div>
           {isWorkTask && (
             <div className="w-full aspect-[4/3] rounded-xl border border-slate-700/50 bg-slate-900/60 flex items-center justify-center overflow-hidden">
-              {image ? (
+              {currentLevel.files || currentLevel.expectedOutbox ? (
+                <div className="w-full h-full overflow-auto p-4 space-y-4 font-mono text-sm">
+                  {currentLevel.files && (
+                    <div>
+                      <div className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2 font-sans">
+                        📁 Folder {folder ? 'po uruchomieniu' : 'przed uruchomieniem'}
+                      </div>
+                      {(folder ?? Object.keys(currentLevel.files).sort()).map((f) => (
+                        <div key={f} className="text-slate-200 py-0.5">{f.includes('/') ? '📂 ' : '📄 '}{f}</div>
+                      ))}
+                      {(folder ?? Object.keys(currentLevel.files)).length === 0 && <div className="text-slate-500 italic">(pusty folder)</div>}
+                    </div>
+                  )}
+                  {currentLevel.expectedOutbox && (
+                    <div>
+                      <div className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2 font-sans">📤 Wysłane maile</div>
+                      {outbox.length === 0 ? (
+                        <div className="text-slate-500 italic">(jeszcze nic nie wysłano)</div>
+                      ) : (
+                        outbox.map((m, i) => (
+                          <div key={i} className="text-slate-200 py-1 border-b border-slate-800 break-all">✉️ {m}</div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : image ? (
                 <img src={`data:image/png;base64,${image}`} alt="Wykres z twojego kodu" className="max-w-full max-h-full bg-white" />
               ) : currentLevel.preview ? (
                 <div className="w-full h-full overflow-auto p-4">
