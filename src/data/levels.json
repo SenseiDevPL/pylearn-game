@@ -471,6 +471,218 @@
   },
   {
     "id": 21,
+    "title": "Czujnik: czy mogę iść?",
+    "description": "NOWOŚĆ: player.can_move() to czujnik. Sprawdza, czy pole przed graczem jest wolne, i odpowiada True (tak) albo False (nie). Sam nie rusza gracza, tylko patrzy. Z pętlą while możesz iść, dopóki droga jest wolna — bez liczenia pól!",
+    "objective": "Użyj pętli while player.can_move(): żeby dojść do końca korytarza.",
+    "starterCode": "# Nowy czujnik: player.can_move()\n# True = mogę iść, False = ściana przed nosem\n",
+    "solution": "while player.can_move():\n    player.move()\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "while\\s+player\\.can_move\\(\\)", "message": "użyj pętli while player.can_move(): zamiast liczyć kroki." },
+    "hints": [
+      "while powtarza, dopóki warunek jest prawdą.",
+      "Warunek to player.can_move() — z nawiasami!",
+      "while player.can_move():\n    player.move()"
+    ],
+    "grid": {
+      "width": 7, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 6, "y": 1 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 22,
+    "title": "Do ściany i skręt",
+    "description": "Czujnik działa w każdym kierunku — zawsze patrzy tam, gdzie gracz jest zwrócony. Po skręcie możesz znowu iść, dopóki droga wolna.",
+    "objective": "Idź w prawo aż do ściany, skręć w prawo (w dół) i idź aż do ściany.",
+    "starterCode": "# Dwie pętle while z czujnikiem i jeden skręt pomiędzy nimi\n",
+    "solution": "while player.can_move():\n    player.move()\nplayer.turn_right()\nwhile player.can_move():\n    player.move()\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "can_move\\(\\)[\\s\\S]*can_move\\(\\)", "message": "użyj czujnika player.can_move() w obu pętlach." },
+    "hints": [
+      "Najpierw while z czujnikiem — dojdziesz do prawej ściany.",
+      "Potem player.turn_right().",
+      "I jeszcze raz ta sama pętla while."
+    ],
+    "grid": {
+      "width": 6, "height": 5,
+      "playerStart": { "x": 0, "y": 0 },
+      "goal": { "x": 5, "y": 4 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 23,
+    "title": "Czujnik skarbu",
+    "description": "NOWOŚĆ: player.on_item() sprawdza, czy gracz stoi na skarbie (True/False). Dzięki niemu nie musisz pamiętać, gdzie leżą skarby — gracz sam zauważy.",
+    "objective": "Idź do końca korytarza i zbieraj skarb zawsze, gdy na nim stoisz.",
+    "starterCode": "# Nowy czujnik: player.on_item()\n# True = stoję na skarbie\n",
+    "solution": "while player.can_move():\n    player.move()\n    if player.on_item():\n        player.collect()\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "on_item\\(\\)", "message": "użyj czujnika player.on_item(), żeby gracz sam zauważał skarby." },
+    "hints": [
+      "Pętla while player.can_move(): z krokiem w środku.",
+      "W pętli, po kroku: if player.on_item():",
+      "W środku if: player.collect() — pamiętaj o wcięciach."
+    ],
+    "grid": {
+      "width": 7, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 6, "y": 1 },
+      "walls": [], "items": [{ "x": 2, "y": 1 }, { "x": 3, "y": 1 }, { "x": 5, "y": 1 }]
+    }
+  },
+  {
+    "id": 24,
+    "title": "Czy już jestem?",
+    "description": "NOWOŚĆ: player.at_goal() mówi, czy gracz stoi na zielonym polu. Słowo not odwraca odpowiedź: not player.at_goal() znaczy „jeszcze nie jestem u celu”. Tu cel jest w środku korytarza — czujnik ściany by go minął.",
+    "objective": "Idź, dopóki NIE jesteś u celu: while not player.at_goal():",
+    "starterCode": "# Nowy czujnik: player.at_goal()\n# not odwraca: not True = False\n",
+    "solution": "while not player.at_goal():\n    player.move()\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "while\\s+not\\s+player\\.at_goal\\(\\)", "message": "użyj pętli while not player.at_goal():" },
+    "hints": [
+      "can_move() doprowadziłby cię do ściany — za daleko.",
+      "Potrzebujesz: dopóki NIE jestem u celu.",
+      "while not player.at_goal():\n    player.move()"
+    ],
+    "grid": {
+      "width": 8, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 4, "y": 1 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 25,
+    "title": "Spirala z czujnikami",
+    "description": "Czujniki pozwalają napisać jeden sprytny przepis zamiast liczyć każde pole: jeśli możesz iść — idź, a jeśli nie — skręć w prawo. Powtarzaj, aż dojdziesz do celu.",
+    "objective": "Napisz pętlę, która sama przejdzie całą spiralę: while not at_goal, a w środku if/else z can_move.",
+    "starterCode": "# Przepis: dopóki nie jestem u celu:\n#   jeśli mogę iść -> idź\n#   w przeciwnym razie -> skręć w prawo\n",
+    "solution": "while not player.at_goal():\n    if player.can_move():\n        player.move()\n    else:\n        player.turn_right()\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "at_goal\\(\\)[\\s\\S]*can_move\\(\\)|can_move\\(\\)[\\s\\S]*at_goal\\(\\)", "message": "użyj obu czujników: at_goal() i can_move()." },
+    "hints": [
+      "Zewnętrzna pętla: while not player.at_goal():",
+      "W środku: if player.can_move(): ... else: ...",
+      "W if: player.move(), w else: player.turn_right()"
+    ],
+    "grid": {
+      "width": 5, "height": 5,
+      "playerStart": { "x": 0, "y": 0 },
+      "goal": { "x": 2, "y": 2 },
+      "walls": [{ "x": 0, "y": 1 }, { "x": 1, "y": 1 }, { "x": 2, "y": 1 }, { "x": 3, "y": 1 }, { "x": 1, "y": 3 }, { "x": 2, "y": 3 }, { "x": 3, "y": 3 }, { "x": 3, "y": 2 }], "items": []
+    }
+  },
+  {
+    "id": 26,
+    "title": "Funkcja, która liczy",
+    "description": "NOWOŚĆ: return oddaje wynik z funkcji. kroki += 1 to skrót od kroki = kroki + 1. A f\"...{ile}...\" wstawia wartość zmiennej w tekst. Funkcja może iść i jednocześnie liczyć kroki — a potem oddać wynik.",
+    "objective": "Napisz funkcję idz_do_sciany(), która idzie do ściany i oddaje (return) liczbę kroków. Wypisz: Przeszedłem 7 pól",
+    "starterCode": "# def idz_do_sciany():\n#     ... licz kroki i zwróć je przez return\n",
+    "solution": "def idz_do_sciany():\n    kroki = 0\n    while player.can_move():\n        player.move()\n        kroki += 1\n    return kroki\n\nile = idz_do_sciany()\nprint(f\"Przeszedłem {ile} pól\")\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "def\\s+\\w+\\([^)]*\\):[\\s\\S]*return", "message": "napisz funkcję, która oddaje liczbę kroków przez return." },
+    "expectedOutput": "Przeszedłem 7 pól",
+    "hints": [
+      "W funkcji: kroki = 0, potem pętla while z player.move() i kroki += 1.",
+      "Po pętli: return kroki",
+      "ile = idz_do_sciany()\nprint(f\"Przeszedłem {ile} pól\")"
+    ],
+    "grid": {
+      "width": 8, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 7, "y": 1 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 27,
+    "title": "Trasa z par",
+    "description": "NOWOŚĆ: para w nawiasach okrągłych (3, \"prawo\") to krotka. W pętli możesz ją od razu rozpakować: for ile, skret in trasa: — pierwsza wartość trafia do ile, druga do skret.",
+    "objective": "Przejdź trasę zapisaną jako lista par: ile kroków, a potem w którą stronę skręcić.",
+    "starterCode": "trasa = [(3, \"prawo\"), (2, \"lewo\"), (2, \"\")]\n# for ile, skret in trasa:\n#     ile razy krok, potem skręt\n",
+    "solution": "trasa = [(3, \"prawo\"), (2, \"lewo\"), (2, \"\")]\nfor ile, skret in trasa:\n    for i in range(ile):\n        player.move()\n    if skret == \"prawo\":\n        player.turn_right()\n    elif skret == \"lewo\":\n        player.turn_left()\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "for\\s+\\w+\\s*,\\s*\\w+\\s+in\\s+trasa", "message": "rozpakuj pary w pętli: for ile, skret in trasa:" },
+    "hints": [
+      "for ile, skret in trasa:",
+      "W środku: for i in range(ile): player.move()",
+      "Potem if skret == \"prawo\": ... elif skret == \"lewo\": ..."
+    ],
+    "grid": {
+      "width": 6, "height": 4,
+      "playerStart": { "x": 0, "y": 0 },
+      "goal": { "x": 5, "y": 2 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 28,
+    "title": "Licznik w słowniku",
+    "description": "NOWOŚĆ: słownik {\"klucz\": wartość} trzyma kilka liczników pod nazwami. licznik[\"skarby\"] += 1 zwiększa tylko jeden z nich. print(licznik) pokaże cały słownik.",
+    "objective": "Idź do celu, zbieraj skarby i licz w słowniku kroki i skarby. Na końcu print(licznik).",
+    "starterCode": "licznik = {\"skarby\": 0, \"kroki\": 0}\n# po każdym kroku: licznik[\"kroki\"] += 1\n# po każdym skarbie: licznik[\"skarby\"] += 1\n",
+    "solution": "licznik = {\"skarby\": 0, \"kroki\": 0}\nwhile not player.at_goal():\n    player.move()\n    licznik[\"kroki\"] += 1\n    if player.on_item():\n        player.collect()\n        licznik[\"skarby\"] += 1\nprint(licznik)\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "licznik\\[\\s*[\\\"']skarby[\\\"']\\s*\\]\\s*\\+=", "message": "licz skarby w słowniku: licznik[\"skarby\"] += 1" },
+    "expectedOutput": "{'skarby': 2, 'kroki': 6}",
+    "hints": [
+      "Pętla while not player.at_goal(): z krokiem w środku.",
+      "Po kroku: licznik[\"kroki\"] += 1, a jeśli on_item() — collect i licznik[\"skarby\"] += 1.",
+      "Na końcu, poza pętlą: print(licznik)"
+    ],
+    "grid": {
+      "width": 7, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 6, "y": 1 },
+      "walls": [], "items": [{ "x": 1, "y": 1 }, { "x": 4, "y": 1 }]
+    }
+  },
+  {
+    "id": 29,
+    "title": "Dwa warunki naraz",
+    "description": "NOWOŚĆ: and łączy dwa warunki — oba muszą być prawdą. while player.can_move() and not player.at_goal(): znaczy „idź, dopóki droga wolna I jeszcze nie jesteś u celu”.",
+    "objective": "Idź z dwoma warunkami naraz i zbierz skarb po drodze.",
+    "starterCode": "# while warunek1 and warunek2:\n",
+    "solution": "while player.can_move() and not player.at_goal():\n    player.move()\n    if player.on_item():\n        player.collect()\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "while[^\\n:]*\\band\\b", "message": "połącz dwa warunki w pętli słowem and." },
+    "hints": [
+      "Warunek 1: player.can_move()",
+      "Warunek 2: not player.at_goal()",
+      "while player.can_move() and not player.at_goal():"
+    ],
+    "grid": {
+      "width": 8, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 5, "y": 1 },
+      "walls": [], "items": [{ "x": 3, "y": 1 }]
+    }
+  },
+  {
+    "id": 30,
+    "title": "Wielki finał: labirynt na czujnikach",
+    "description": "Finał części tradycyjnej. Stary sposób wędrowców po labiryncie: trzymaj prawą rękę na ścianie. Po każdym kroku skręć w prawo i sprawdź drogę; jeśli zamknięta — skręcaj w lewo, aż się otworzy. Czujnik skarbu zbierze wszystko po drodze.",
+    "objective": "Przejdź labirynt metodą prawej ręki i zbierz oba skarby.",
+    "starterCode": "# Metoda prawej ręki:\n# dopóki nie u celu:\n#   skręć w prawo\n#   dopóki nie możesz iść -> skręć w lewo\n#   idź; jeśli skarb -> zbierz\n",
+    "solution": "while not player.at_goal():\n    player.turn_right()\n    while not player.can_move():\n        player.turn_left()\n    player.move()\n    if player.on_item():\n        player.collect()\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "can_move\\(\\)", "message": "użyj czujników — przepis ma działać w każdym labiryncie." },
+    "hints": [
+      "Zewnętrzna pętla: while not player.at_goal():",
+      "W środku: turn_right(), potem while not player.can_move(): turn_left()",
+      "Na końcu pętli: move(), a jeśli on_item() — collect()."
+    ],
+    "grid": {
+      "width": 6, "height": 5,
+      "playerStart": { "x": 0, "y": 0 },
+      "goal": { "x": 5, "y": 4 },
+      "walls": [{ "x": 3, "y": 0 }, { "x": 0, "y": 1 }, { "x": 1, "y": 1 }, { "x": 3, "y": 1 }, { "x": 5, "y": 1 }, { "x": 5, "y": 2 }, { "x": 1, "y": 3 }, { "x": 2, "y": 3 }, { "x": 3, "y": 3 }, { "x": 3, "y": 4 }], "items": [{ "x": 0, "y": 4 }, { "x": 4, "y": 2 }]
+    }
+  },
+  {
+    "id": 31,
     "title": "Kod od AI: trasa do skarbu",
     "ai": true,
     "description": "Od teraz kod za ciebie pisze asystent AI, a ty jesteś kontrolerem jakości. AI pisze szybko i zawsze brzmi pewnie — ale często się myli: liczy o jeden krok za dużo, wymyśla komendy, których nie ma, albo robi nie to, o co prosiłeś. Zasada numer 1: nigdy nie ufaj kodowi, którego nie uruchomiłeś.",
@@ -488,6 +700,414 @@
       "playerStart": { "x": 0, "y": 2 },
       "goal": { "x": 3, "y": 0 },
       "walls": [], "items": [{ "x": 3, "y": 2 }]
+    }
+  },
+  {
+    "id": 32,
+    "title": "Skok, którego nie ma",
+    "ai": true,
+    "description": "Halucynacja: AI wymyśliło komendę player.jump(), bo „brzmi sensownie”. Taka komenda nie istnieje — gracz umie tylko move, turn_left, turn_right, collect i say. AI często wymyśla funkcje z innych gier albo języków.",
+    "objective": "Uruchom, przeczytaj błąd i poprowadź gracza dookoła ściany prawdziwymi komendami.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"dojdź do celu za ścianą\"\n# Odpowiedź AI: \"Przeskakuję ścianę, gotowe!\"\nplayer.move()\nplayer.jump()\nplayer.move()\nplayer.move()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"dojdź do celu za ścianą\"\n# Odpowiedź AI: \"Przeskakuję ścianę, gotowe!\"\nplayer.move()\nplayer.turn_left()\nplayer.move()\nplayer.turn_right()\nplayer.move()\nplayer.move()\nplayer.turn_right()\nplayer.move()\nplayer.turn_left()\nplayer.move()\n",
+    "expectedCommands": [],
+    "hints": [
+      "Komendy jump nie ma — trzeba obejść ścianę górą.",
+      "Po pierwszym kroku: skręć w lewo (w górę), krok, skręć w prawo.",
+      "Nad ścianą 2 kroki w prawo, potem w prawo (w dół), krok, w lewo i krok do celu."
+    ],
+    "grid": {
+      "width": 6, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 4, "y": 1 },
+      "walls": [{ "x": 2, "y": 1 }], "items": []
+    }
+  },
+  {
+    "id": 33,
+    "title": "Cicha halucynacja",
+    "ai": true,
+    "description": "Najgroźniejsze halucynacje nie dają błędu. AI napisało player.move(3), myśląc, że to „3 kroki”. Python nie protestuje — ale move(3) robi zawsze JEDEN krok. Kod działa, tylko robi coś innego, niż myśli AI.",
+    "objective": "Uruchom i policz, ile kroków naprawdę robi gracz. Popraw tak, żeby szedł 3 pola, potem 2 w dół.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"3 pola w prawo, potem 2 w dół\"\n# Odpowiedź AI: \"move przyjmuje liczbę kroków\"\nplayer.move(3)\nplayer.turn_right()\nplayer.move(2)\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"3 pola w prawo, potem 2 w dół\"\n# Odpowiedź AI: \"move przyjmuje liczbę kroków\"\nfor i in range(3):\n    player.move()\nplayer.turn_right()\nfor i in range(2):\n    player.move()\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "range\\(\\s*3\\s*\\)", "message": "zrób 3 kroki pętlą for i in range(3):" },
+    "hints": [
+      "Obserwuj gracza: ile pól przeszedł po move(3)?",
+      "Kilka kroków robi się pętlą: for i in range(3):",
+      "Zamień move(3) na pętlę range(3), a move(2) na pętlę range(2)."
+    ],
+    "grid": {
+      "width": 6, "height": 4,
+      "playerStart": { "x": 0, "y": 0 },
+      "goal": { "x": 3, "y": 2 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 34,
+    "title": "Prawo czy lewo?",
+    "ai": true,
+    "description": "AI myli strony częściej, niż myślisz — zwłaszcza gdy „prawo” zależy od tego, w którą stronę gracz patrzy. Tu AI skręciło w złą stronę i gracz wychodzi poza planszę.",
+    "objective": "Uruchom, zobacz, gdzie gracz uderza, i popraw skręt.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"2 pola w prawo, potem 3 w dół\"\n# Odpowiedź AI: \"Gotowe!\"\nplayer.move()\nplayer.move()\nplayer.turn_left()\nplayer.move()\nplayer.move()\nplayer.move()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"2 pola w prawo, potem 3 w dół\"\n# Odpowiedź AI: \"Gotowe!\"\nplayer.move()\nplayer.move()\nplayer.turn_right()\nplayer.move()\nplayer.move()\nplayer.move()\n",
+    "expectedCommands": [],
+    "hints": [
+      "Gracz patrzy w prawo. W którą stronę musi skręcić, żeby patrzeć w dół?",
+      "Skręt w lewo obraca go w górę — poza planszę.",
+      "Zamień turn_left() na turn_right()."
+    ],
+    "grid": {
+      "width": 5, "height": 5,
+      "playerStart": { "x": 0, "y": 0 },
+      "goal": { "x": 2, "y": 3 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 35,
+    "title": "Wcięcie ma znaczenie",
+    "ai": true,
+    "description": "W Pythonie to spacje na początku linijki decydują, co jest W ŚRODKU pętli. AI wyrównało if do lewej — więc sprawdzenie skarbu dzieje się tylko raz, po całej pętli, a nie po każdym kroku.",
+    "objective": "Uruchom i zobacz, które skarby zostały. Popraw wcięcia.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zbieraj skarby po drodze do celu\"\n# Odpowiedź AI: \"Zbieram każdy skarb!\"\nfor i in range(5):\n    player.move()\nif player.on_item():\n    player.collect()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zbieraj skarby po drodze do celu\"\n# Odpowiedź AI: \"Zbieram każdy skarb!\"\nfor i in range(5):\n    player.move()\n    if player.on_item():\n        player.collect()\n",
+    "expectedCommands": [],
+    "hints": [
+      "Które linijki są w środku pętli? Te z 4 spacjami na początku.",
+      "if ma się wykonać po KAŻDYM kroku — musi być w pętli.",
+      "Dodaj 4 spacje przed if i przed collect (collect ma mieć 8)."
+    ],
+    "grid": {
+      "width": 7, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 5, "y": 1 },
+      "walls": [], "items": [{ "x": 2, "y": 1 }, { "x": 4, "y": 1 }]
+    }
+  },
+  {
+    "id": 36,
+    "title": "Pętla bez końca",
+    "ai": true,
+    "description": "AI napisało pętlę, która kręci się w kółko i nigdy nie dochodzi do celu. Gra przerwie ją po 1000 ruchach. W prawdziwym programie taka pętla zawiesza stronę albo serwer.",
+    "objective": "Uruchom, przeczytaj komunikat i popraw przepis tak, żeby gracz przeszedł korytarz z zakrętami.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"przejdź korytarz z zakrętami\"\n# Odpowiedź AI: \"Skręcam przy każdej okazji, dojdę na pewno!\"\nwhile not player.at_goal():\n    player.turn_right()\n    if player.can_move():\n        player.move()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"przejdź korytarz z zakrętami\"\n# Odpowiedź AI: \"Skręcam przy każdej okazji, dojdę na pewno!\"\nwhile not player.at_goal():\n    if player.can_move():\n        player.move()\n    else:\n        player.turn_right()\n",
+    "expectedCommands": [],
+    "hints": [
+      "AI skręca PRZED każdym krokiem — więc gracz kręci się w kółko.",
+      "Skręcać trzeba tylko wtedy, gdy droga jest zamknięta.",
+      "if player.can_move(): move, else: turn_right()"
+    ],
+    "grid": {
+      "width": 5, "height": 5,
+      "playerStart": { "x": 0, "y": 0 },
+      "goal": { "x": 2, "y": 2 },
+      "walls": [{ "x": 0, "y": 1 }, { "x": 1, "y": 1 }, { "x": 2, "y": 1 }, { "x": 3, "y": 1 }, { "x": 1, "y": 3 }, { "x": 2, "y": 3 }, { "x": 3, "y": 3 }, { "x": 3, "y": 2 }], "items": []
+    }
+  },
+  {
+    "id": 37,
+    "title": "AI zgadło wzór",
+    "ai": true,
+    "description": "AI lubi zgadywać wzory: „skarby leżą co drugie pole”. Tu wzór się nie sprawdził — jeden skarb leży gdzie indziej. Zamiast zgadywać, lepiej sprawdzać czujnikiem.",
+    "objective": "Uruchom, zobacz, który skarb został, i przepisz kod tak, żeby zbierał skarby tam, gdzie naprawdę leżą.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zbierz WSZYSTKIE skarby i dojdź do celu\"\n# Odpowiedź AI: \"Skarby są co drugie pole, zbieram!\"\nfor i in range(3):\n    player.move()\n    player.collect()\n    player.move()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zbierz WSZYSTKIE skarby i dojdź do celu\"\n# Odpowiedź AI: \"Skarby są co drugie pole, zbieram!\"\nfor i in range(6):\n    player.move()\n    if player.on_item():\n        player.collect()\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "on_item\\(\\)", "message": "sprawdzaj czujnikiem player.on_item() zamiast zgadywać wzór." },
+    "hints": [
+      "Popatrz na planszę: czy skarby naprawdę leżą co drugie pole?",
+      "Zamiast zgadywać, idź pole po polu i sprawdzaj player.on_item().",
+      "for i in range(6): move, a jeśli on_item() — collect."
+    ],
+    "grid": {
+      "width": 7, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 6, "y": 1 },
+      "walls": [], "items": [{ "x": 1, "y": 1 }, { "x": 2, "y": 1 }, { "x": 5, "y": 1 }]
+    }
+  },
+  {
+    "id": 38,
+    "title": "Czujnik bez nawiasów",
+    "ai": true,
+    "description": "Klasyczny błąd w Pythonie: AI napisało player.can_move bez nawiasów. Bez () czujnik nie jest pytany o zdanie — Python traktuje go jako „coś istnieje”, czyli zawsze prawda. Gracz idzie na ślepo.",
+    "objective": "Uruchom, zobacz, gdzie gracz uderza, i popraw czujnik.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"idź, ale nie wchodź w ścianę\"\n# Odpowiedź AI: \"Sprawdzam czujnikiem przed każdym krokiem\"\nfor i in range(8):\n    if player.can_move:\n        player.move()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"idź, ale nie wchodź w ścianę\"\n# Odpowiedź AI: \"Sprawdzam czujnikiem przed każdym krokiem\"\nfor i in range(8):\n    if player.can_move():\n        player.move()\n",
+    "expectedCommands": [],
+    "hints": [
+      "Porównaj z poprzednimi poziomami: jak wywołujesz czujnik?",
+      "Każda komenda i czujnik potrzebują nawiasów ().",
+      "if player.can_move():"
+    ],
+    "grid": {
+      "width": 6, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 5, "y": 1 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 39,
+    "title": "Duża litera, duży problem",
+    "ai": true,
+    "description": "Dla komputera \"prawo\" i \"Prawo\" to dwa różne słowa. AI porównało z wielką literą, więc skręt nigdy się nie wykonuje. Takie błędy są niewidoczne na pierwszy rzut oka.",
+    "objective": "Uruchom i zobacz, czy gracz skręca. Popraw porównanie.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"wykonaj trasę z listy\"\n# Odpowiedź AI: \"Obsługuję wszystkie kroki z listy\"\ntrasa = [\"prosto\", \"prosto\", \"prawo\", \"prosto\", \"prosto\"]\nfor krok in trasa:\n    if krok == \"prosto\":\n        player.move()\n    elif krok == \"Prawo\":\n        player.turn_right()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"wykonaj trasę z listy\"\n# Odpowiedź AI: \"Obsługuję wszystkie kroki z listy\"\ntrasa = [\"prosto\", \"prosto\", \"prawo\", \"prosto\", \"prosto\"]\nfor krok in trasa:\n    if krok == \"prosto\":\n        player.move()\n    elif krok == \"prawo\":\n        player.turn_right()\n",
+    "expectedCommands": [],
+    "hints": [
+      "Gracz w ogóle nie skręca. Który warunek się nie spełnia?",
+      "Porównaj litera po literze: słowo w liście i słowo w if.",
+      "\"Prawo\" zamień na \"prawo\"."
+    ],
+    "grid": {
+      "width": 6, "height": 4,
+      "playerStart": { "x": 0, "y": 0 },
+      "goal": { "x": 2, "y": 2 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 40,
+    "title": "Za daleko",
+    "ai": true,
+    "description": "AI użyło czujnika ściany, bo „tak się chodzi korytarzem”. Ale cel jest w środku korytarza, a nie przy ścianie — gracz go mija. AI wybrało narzędzie, które zwykle pasuje, a nie to, które pasuje TU.",
+    "objective": "Uruchom i zobacz, gdzie gracz się zatrzymuje. Użyj właściwego czujnika.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"dojdź do zielonego pola\"\n# Odpowiedź AI: \"Idę korytarzem do końca\"\nwhile player.can_move():\n    player.move()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"dojdź do zielonego pola\"\n# Odpowiedź AI: \"Idę korytarzem do końca\"\nwhile not player.at_goal():\n    player.move()\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "at_goal\\(\\)", "message": "użyj czujnika celu: player.at_goal()." },
+    "hints": [
+      "Gracz staje przy ścianie, a cel jest wcześniej.",
+      "Potrzebny jest czujnik celu, nie ściany.",
+      "while not player.at_goal():"
+    ],
+    "grid": {
+      "width": 8, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 4, "y": 1 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 41,
+    "title": "Licznik, który się zeruje",
+    "ai": true,
+    "description": "AI wstawiło kroki = 0 do środka pętli. Przy każdym obrocie licznik wraca do zera — więc na końcu zawsze pokazuje 1. Gracz dochodzi do celu, ale raport kłamie.",
+    "objective": "Uruchom i porównaj wynik w konsoli z liczbą kroków. Popraw licznik.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"dojdź do celu i powiedz, ile zrobiłeś kroków\"\n# Odpowiedź AI: \"Liczę każdy krok\"\nfor i in range(5):\n    kroki = 0\n    player.move()\n    kroki += 1\nprint(f\"Kroki: {kroki}\")\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"dojdź do celu i powiedz, ile zrobiłeś kroków\"\n# Odpowiedź AI: \"Liczę każdy krok\"\nkroki = 0\nfor i in range(5):\n    player.move()\n    kroki += 1\nprint(f\"Kroki: {kroki}\")\n",
+    "expectedCommands": [],
+    "expectedOutput": "Kroki: 5",
+    "hints": [
+      "Konsola pokazuje Kroki: 1 — a gracz przeszedł 5 pól.",
+      "Gdzie licznik jest ustawiany na 0? Ile razy to się dzieje?",
+      "Przenieś kroki = 0 PRZED pętlę."
+    ],
+    "grid": {
+      "width": 7, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 5, "y": 1 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 42,
+    "title": "Funkcja, która nic nie oddaje",
+    "ai": true,
+    "description": "AI policzyło odległość w funkcji, ale zapomniało return. Funkcja bez return oddaje None (czyli „nic”) — a z niczego nie da się zrobić pętli.",
+    "objective": "Uruchom, przeczytaj błąd i popraw funkcję.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"policz odległość do celu i tyle kroków zrób\"\n# Odpowiedź AI: \"Funkcja liczy odległość\"\ndef odleglosc(start, cel):\n    wynik = cel - start\n\nfor i in range(odleglosc(0, 4)):\n    player.move()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"policz odległość do celu i tyle kroków zrób\"\n# Odpowiedź AI: \"Funkcja liczy odległość\"\ndef odleglosc(start, cel):\n    wynik = cel - start\n    return wynik\n\nfor i in range(odleglosc(0, 4)):\n    player.move()\n",
+    "expectedCommands": [],
+    "hints": [
+      "Błąd mówi o NoneType — to jest „nic”.",
+      "Funkcja liczy wynik, ale go nie oddaje.",
+      "Dopisz w funkcji: return wynik"
+    ],
+    "grid": {
+      "width": 6, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 4, "y": 1 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 43,
+    "title": "Zła kolejność",
+    "ai": true,
+    "description": "AI zbiera skarb PRZED krokiem, a nie po nim. Przez większość drogi to nie przeszkadza — ale skarb leżący na samym celu zostaje, bo po ostatnim kroku już nikt nie sprawdza.",
+    "objective": "Uruchom, zobacz, który skarb został, i zamień kolejność.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zbieraj skarby po drodze do celu\"\n# Odpowiedź AI: \"Zbieram na każdym polu\"\nfor i in range(5):\n    player.collect()\n    player.move()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zbieraj skarby po drodze do celu\"\n# Odpowiedź AI: \"Zbieram na każdym polu\"\nfor i in range(5):\n    player.move()\n    player.collect()\n",
+    "expectedCommands": [],
+    "hints": [
+      "Który skarb został? Ten na zielonym polu.",
+      "Po ostatnim kroku nie ma już zbierania.",
+      "Zamień kolejność: najpierw move(), potem collect()."
+    ],
+    "grid": {
+      "width": 7, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 5, "y": 1 },
+      "walls": [], "items": [{ "x": 3, "y": 1 }, { "x": 5, "y": 1 }]
+    }
+  },
+  {
+    "id": 44,
+    "title": "Uporządkowana trasa",
+    "ai": true,
+    "description": "AI „uporządkowało” trasę metodą sort() — alfabetycznie. Brzmi porządnie, ale kolejność kroków to cała trasa! Teraz gracz najpierw skręca, a potem idzie — w złą stronę.",
+    "objective": "Uruchom i popraw tak, żeby trasa szła w kolejności, w jakiej ją zapisano.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"wykonaj trasę z listy\"\n# Odpowiedź AI: \"Najpierw uporządkowałem trasę\"\ntrasa = [\"prosto\", \"prosto\", \"prawo\", \"prosto\"]\ntrasa.sort()\nfor krok in trasa:\n    if krok == \"prosto\":\n        player.move()\n    elif krok == \"prawo\":\n        player.turn_right()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"wykonaj trasę z listy\"\n# Odpowiedź AI: \"Najpierw uporządkowałem trasę\"\ntrasa = [\"prosto\", \"prosto\", \"prawo\", \"prosto\"]\nfor krok in trasa:\n    if krok == \"prosto\":\n        player.move()\n    elif krok == \"prawo\":\n        player.turn_right()\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "^(?![\\s\\S]*\\.sort\\()", "message": "trasy nie wolno sortować — usuń trasa.sort()." },
+    "hints": [
+      "Dodaj print(trasa) po sort() i zobacz, co się stało z listą.",
+      "Kolejność kroków ma znaczenie — nie wolno jej sortować.",
+      "Usuń linijkę trasa.sort()."
+    ],
+    "grid": {
+      "width": 5, "height": 3,
+      "playerStart": { "x": 0, "y": 0 },
+      "goal": { "x": 2, "y": 1 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 45,
+    "title": "Hasło w konsoli",
+    "ai": true,
+    "description": "Bezpieczeństwo: AI zostawiło linijkę „DEBUG”, która wypisuje hasło do konsoli. Konsolę i logi czyta wiele osób i programów — hasło wypisane raz jest już spalone. Gracz dochodzi do celu, ale kod jest dziurawy.",
+    "objective": "Znajdź wyciek hasła i usuń go tak, żeby gracz dalej doszedł do celu.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# --- system drzwi (nie ruszaj) ---\ndef haslo_z_sejfu():\n    return \"Smok-2026\"\n# --- koniec systemu ---\n\n# Prośba: \"otwórz drzwi hasłem i dojdź do celu\"\n# Odpowiedź AI: \"Działa, dodałem podgląd do testów\"\nhaslo = haslo_z_sejfu()\nprint(\"DEBUG: haslo =\", haslo)\nif haslo == haslo_z_sejfu():\n    for i in range(4):\n        player.move()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# --- system drzwi (nie ruszaj) ---\ndef haslo_z_sejfu():\n    return \"Smok-2026\"\n# --- koniec systemu ---\n\n# Prośba: \"otwórz drzwi hasłem i dojdź do celu\"\n# Odpowiedź AI: \"Działa, dodałem podgląd do testów\"\nhaslo = haslo_z_sejfu()\nif haslo == haslo_z_sejfu():\n    for i in range(4):\n        player.move()\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "^(?![\\s\\S]*print\\([^)\\n]*haslo)", "message": "hasło nie może trafić do konsoli — usuń print z hasłem." },
+    "hints": [
+      "Zajrzyj do konsoli po uruchomieniu. Co tam widać?",
+      "Hasło nie może trafić do print().",
+      "Usuń linijkę z DEBUG."
+    ],
+    "grid": {
+      "width": 6, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 4, "y": 1 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 46,
+    "title": "Polecenie od hakera",
+    "ai": true,
+    "description": "Bezpieczeństwo: exec() uruchamia dowolny tekst jako kod. AI użyło go do wykonania polecenia z internetu — a haker dopisał do polecenia własne komendy i przejął gracza. Zasada: nigdy nie uruchamiaj tekstu od użytkownika jako kodu.",
+    "objective": "Przepisz kod bez exec: czytaj polecenie litera po literze i wykonuj tylko dozwolone litery M (krok) i R (skręt w prawo).",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Umowa: M = krok, R = skręt w prawo. Tylko te litery!\npolecenie = \"MMMM\"\npolecenie += \"\\nplayer.turn_left()\\nplayer.move()\"   # <- dopisał haker\n\n# Odpowiedź AI: \"Zamieniam litery na komendy i wykonuję\"\nkod = polecenie.replace(\"M\", \"player.move()\\n\").replace(\"R\", \"player.turn_right()\\n\")\nexec(kod)\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Umowa: M = krok, R = skręt w prawo. Tylko te litery!\npolecenie = \"MMMM\"\npolecenie += \"\\nplayer.turn_left()\\nplayer.move()\"   # <- dopisał haker\n\n# Odpowiedź AI: \"Zamieniam litery na komendy i wykonuję\"\nfor litera in polecenie:\n    if litera == \"M\":\n        player.move()\n    elif litera == \"R\":\n        player.turn_right()\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "^(?![\\s\\S]*\\bexec\\s*\\()", "message": "usuń exec — nie wolno uruchamiać tekstu od użytkownika jako kodu." },
+    "hints": [
+      "Uruchom: gracz robi więcej, niż pozwala umowa.",
+      "Usuń exec i dwie linijki nad nim.",
+      "for litera in polecenie: if litera == \"M\": move, elif litera == \"R\": turn_right — resztę ignoruj."
+    ],
+    "grid": {
+      "width": 6, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 4, "y": 1 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 47,
+    "title": "Skopiowane dwa razy",
+    "ai": true,
+    "description": "AI czasem powtarza kawałek kodu — np. skleja dwie wersje odpowiedzi. Każda linijka wygląda dobrze, ale razem gracz robi za dużo kroków.",
+    "objective": "Uruchom, zobacz, gdzie gracz uderza, i usuń zbędne kroki.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zbierz skarb i dojdź do celu\"\n# Odpowiedź AI: \"Gotowe!\"\n# idź do skarbu i zbierz\nplayer.move()\nplayer.move()\nplayer.collect()\n# idź do celu\nplayer.move()\nplayer.move()\nplayer.move()\nplayer.move()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zbierz skarb i dojdź do celu\"\n# Odpowiedź AI: \"Gotowe!\"\n# idź do skarbu i zbierz\nplayer.move()\nplayer.move()\nplayer.collect()\n# idź do celu\nplayer.move()\nplayer.move()\n",
+    "expectedCommands": [],
+    "hints": [
+      "Policz na planszy: ile pól jest od skarbu do celu?",
+      "AI zrobiło 4 kroki zamiast 2.",
+      "Usuń dwa ostatnie player.move()."
+    ],
+    "grid": {
+      "width": 6, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 4, "y": 1 },
+      "walls": [], "items": [{ "x": 2, "y": 1 }]
+    }
+  },
+  {
+    "id": 48,
+    "title": "Albo zamiast i",
+    "ai": true,
+    "description": "AI pomyliło or (albo) z and (i). „Idź, dopóki droga wolna ALBO nie jesteś u celu” — przy celu droga jest dalej wolna, więc gracz idzie dalej, aż uderzy w ścianę.",
+    "objective": "Uruchom i popraw warunek pętli.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"idź do celu, ale nie wchodź w ścianę\"\n# Odpowiedź AI: \"Pilnuję obu warunków\"\nwhile player.can_move() or not player.at_goal():\n    player.move()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"idź do celu, ale nie wchodź w ścianę\"\n# Odpowiedź AI: \"Pilnuję obu warunków\"\nwhile player.can_move() and not player.at_goal():\n    player.move()\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "while[^\\n:]*\\band\\b", "message": "oba warunki muszą być spełnione naraz — użyj and." },
+    "hints": [
+      "Czy przy celu droga przed graczem jest wolna?",
+      "Gracz ma iść tylko, gdy OBA warunki są prawdą.",
+      "Zamień or na and."
+    ],
+    "grid": {
+      "width": 8, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 4, "y": 1 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 49,
+    "title": "Zmyślona nazwa",
+    "ai": true,
+    "description": "AI utworzyło zmienną kroki, a w pętli użyło nazwy krok. To też halucynacja — AI „pamięta”, że coś nazwało, ale nie dokładnie jak.",
+    "objective": "Uruchom, przeczytaj błąd i popraw nazwę.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zrób 4 kroki do celu\"\n# Odpowiedź AI: \"Gotowe!\"\nkroki = 4\nfor i in range(krok):\n    player.move()\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zrób 4 kroki do celu\"\n# Odpowiedź AI: \"Gotowe!\"\nkroki = 4\nfor i in range(kroki):\n    player.move()\n",
+    "expectedCommands": [],
+    "hints": [
+      "Błąd mówi, której nazwy Python nie zna.",
+      "Porównaj nazwę w range() z nazwą zmiennej wyżej.",
+      "range(krok) zamień na range(kroki)."
+    ],
+    "grid": {
+      "width": 6, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 4, "y": 1 },
+      "walls": [], "items": []
+    }
+  },
+  {
+    "id": 50,
+    "title": "Wielki finał: recenzja kodu",
+    "ai": true,
+    "description": "Finał: prawdziwa recenzja kodu. AI mówi „przetestowałem, działa”, a w kodzie są trzy błędy z poprzednich poziomów. Poprawiaj po jednym i uruchamiaj po każdej poprawce — tak wygląda codzienna praca z AI.",
+    "objective": "Gracz ma dojść do celu, zebrać oba skarby i wypisać: Zebrałem 2 skarby. Znajdź i popraw 3 błędy.",
+    "starterCode": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"dojdź do celu, zbierz skarby i powiedz ile\"\n# Odpowiedź AI: \"Przetestowałem, działa!\"\nwhile not player.at_goal:\n    zebrane = 0\n    player.move()\nif player.on_item():\n    player.collect()\n    zebrane += 1\nprint(f\"Zebrałem {zebrane} skarby\")\n",
+    "solution": "# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"dojdź do celu, zbierz skarby i powiedz ile\"\n# Odpowiedź AI: \"Przetestowałem, działa!\"\nzebrane = 0\nwhile not player.at_goal():\n    player.move()\n    if player.on_item():\n        player.collect()\n        zebrane += 1\nprint(f\"Zebrałem {zebrane} skarby\")\n",
+    "expectedCommands": [],
+    "expectedOutput": "Zebrałem 2 skarby",
+    "hints": [
+      "Błąd 1: czujnik bez nawiasów — at_goal().",
+      "Błąd 2: if ze zbieraniem jest poza pętlą — popraw wcięcia.",
+      "Błąd 3: licznik zeruje się w każdym obrocie — przenieś zebrane = 0 przed pętlę."
+    ],
+    "grid": {
+      "width": 8, "height": 3,
+      "playerStart": { "x": 0, "y": 1 },
+      "goal": { "x": 6, "y": 1 },
+      "walls": [], "items": [{ "x": 2, "y": 1 }, { "x": 5, "y": 1 }]
     }
   }
 ]

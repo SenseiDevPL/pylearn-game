@@ -3,17 +3,11 @@ import { GameCanvas, type GameCanvasHandle } from './components/GameCanvas.tsx'
 import { CodeEditor } from './components/CodeEditor.tsx'
 import { LevelPanel } from './components/LevelPanel.tsx'
 import { FeedbackOverlay } from './components/FeedbackOverlay.tsx'
-import { LoginGate } from './components/LoginGate.tsx'
 import { usePyodide } from './hooks/usePyodide.ts'
 import levelsData from './data/levels.json'
 import type { GameState, Level } from './types/index.ts'
 
 const levels = levelsData as Level[]
-const FREE_LEVELS = 5
-
-function getStoredEmail(): string | null {
-  return localStorage.getItem('pylearn_email')
-}
 
 export default function App() {
   const gameRef = useRef<GameCanvasHandle>(null)
@@ -26,8 +20,6 @@ export default function App() {
   const [output, setOutput] = useState('')
   const [executionTime, setExecutionTime] = useState<number | null>(null)
   const [hintCount, setHintCount] = useState(0)
-  const [showLoginGate, setShowLoginGate] = useState(false)
-  const [unlocked, setUnlocked] = useState(() => !!getStoredEmail())
   const [showingSolution, setShowingSolution] = useState(false)
 
   const currentLevel = levels[currentLevelIdx]
@@ -72,6 +64,20 @@ export default function App() {
       }
 
       const outcome = await gameRef.current?.executeCommands(result.commands)
+      if (outcome === 'win') {
+        const req = currentLevel.requires
+        if (req && !new RegExp(req.pattern).test(code)) {
+          setGameState('failure')
+          setError(`Gracz doszedł do celu, ale zadanie było inne: ${req.message}`)
+          return
+        }
+        const expected = currentLevel.expectedOutput
+        if (expected !== undefined && result.output.trim() !== expected) {
+          setGameState('failure')
+          setError(`Gracz doszedł do celu, ale w konsoli miało się wypisać:\n${expected}`)
+          return
+        }
+      }
       setGameState(outcome === 'win' ? 'success' : 'failure')
       if (outcome === 'wall') {
         setError('Gracz uderzył w ścianę albo w krawędź planszy (mignął na czerwono). Sprawdź kierunek i liczbę kroków.')
@@ -90,29 +96,12 @@ export default function App() {
   const handleNextLevel = useCallback(() => {
     const nextIdx = currentLevelIdx + 1
     if (nextIdx >= levels.length) return
-
-    if (nextIdx >= FREE_LEVELS && !unlocked) {
-      setShowLoginGate(true)
-      return
-    }
-
     setCurrentLevelIdx(nextIdx)
-  }, [currentLevelIdx, unlocked])
-
-  const handleLogin = useCallback((email: string) => {
-    localStorage.setItem('pylearn_email', email)
-    setUnlocked(true)
-    setShowLoginGate(false)
-    setCurrentLevelIdx(FREE_LEVELS)
-  }, [])
+  }, [currentLevelIdx])
 
   const handleSelectLevel = useCallback((idx: number) => {
-    if (idx >= FREE_LEVELS && !unlocked) {
-      setShowLoginGate(true)
-      return
-    }
     setCurrentLevelIdx(idx)
-  }, [unlocked])
+  }, [])
 
   const handleShowSolution = useCallback(() => {
     setCode(currentLevel.solution)
@@ -130,8 +119,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 p-4 md:p-6">
-      {showLoginGate && <LoginGate onLogin={handleLogin} onClose={() => setShowLoginGate(false)} />}
-
       <header className="max-w-6xl mx-auto mb-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
@@ -153,23 +140,22 @@ export default function App() {
         </div>
         <div className="flex gap-1 flex-wrap">
           {levels.map((l, i) => {
-            const isLocked = i >= FREE_LEVELS && !unlocked
             return (
               <button
                 key={l.id}
                 onClick={() => handleSelectLevel(i)}
                 className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
-                  isLocked
-                    ? 'bg-slate-800/50 text-slate-600 border border-slate-700/30 cursor-pointer'
-                    : i === currentLevelIdx
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-                      : i < currentLevelIdx
-                        ? 'bg-emerald-600/30 text-emerald-400 border border-emerald-600/30'
+                  i === currentLevelIdx
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                    : i < currentLevelIdx
+                      ? 'bg-emerald-600/30 text-emerald-400 border border-emerald-600/30'
+                      : l.ai
+                        ? 'bg-violet-950/60 text-violet-300 border border-violet-700/50'
                         : 'bg-slate-800 text-slate-500 border border-slate-700/50'
                 }`}
-                title={isLocked ? 'Zaloguj się aby odblokować' : l.title}
+                title={l.ai ? `🤖 ${l.title}` : l.title}
               >
-                {isLocked ? '\u{1F512}' : l.id}
+                {l.id}
               </button>
             )
           })}

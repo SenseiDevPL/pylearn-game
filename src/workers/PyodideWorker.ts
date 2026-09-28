@@ -1,6 +1,8 @@
 /// <reference lib="webworker" />
 
-import type { ExecutionResult, GameCommand, WorkerMessage, WorkerResponse } from '../types/index.ts'
+import type { ExecutionResult, GameCommand, Level, WorkerMessage, WorkerResponse } from '../types/index.ts'
+import levelsData from '../data/levels.json'
+import bridgeSource from './bridge.py?raw'
 
 declare const self: DedicatedWorkerGlobalScope
 
@@ -27,46 +29,13 @@ async function initPyodide() {
   }
 }
 
+const levels = levelsData as Level[]
+
+// bridge.py defines `player` and simulates the board; it reads the level's
+// grid from _LEVEL_JSON (a JSON string is also a valid Python string literal).
 function buildPythonBridge(levelId: number): string {
-  return `
-import json as _json
-
-_commands = []
-
-class _Player:
-    def move(self, direction="forward"):
-        _commands.append({"action": "move", "args": {"direction": direction}})
-
-    def move_forward(self):
-        self.move("forward")
-
-    def move_back(self):
-        self.move("back")
-
-    def turn_left(self):
-        _commands.append({"action": "turn", "args": {"direction": "left"}})
-
-    def turn_right(self):
-        _commands.append({"action": "turn", "args": {"direction": "right"}})
-
-    def say(self, text):
-        _commands.append({"action": "say", "args": {"text": str(text)}})
-
-    def collect(self):
-        _commands.append({"action": "collect", "args": {}})
-
-player = _Player()
-_level_id = ${levelId}
-_output_lines = []
-
-_original_print = print
-def print(*args, **kwargs):
-    import io
-    buf = io.StringIO()
-    _original_print(*args, file=buf, **kwargs)
-    _output_lines.append(buf.getvalue().rstrip('\\n'))
-
-`
+  const grid = levels.find((l) => l.id === levelId)?.grid ?? levels[0].grid
+  return `_LEVEL_JSON = ${JSON.stringify(JSON.stringify(grid))}\n_level_id = ${levelId}\n` + bridgeSource
 }
 
 const RESULT_EXTRACTOR = `
@@ -84,10 +53,14 @@ function explainPythonError(raw: string, fallback: string): string {
     return `Gracz nie zna komendy player.${m[1]}() — taka komenda nie istnieje. Dostępne: move, turn_left, turn_right, collect, say.`
   if ((m = last.match(/NameError: name '(\w+)' is not defined/)))
     return `Nie znam nazwy ${m[1]} — literówka albo zmienna nie została utworzona.`
+  if (/_TOO_MANY_COMMANDS/.test(last))
+    return 'Za dużo ruchów (ponad 1000) — prawdopodobnie pętla, która nigdy się nie kończy.'
   if (/IndentationError/.test(last))
     return 'Złe wcięcie — linijki w środku pętli, if albo funkcji muszą mieć tyle samo spacji na początku.'
   if (/SyntaxError/.test(last))
     return `Błąd pisowni kodu (sprawdź dwukropki, nawiasy i cudzysłowy). Python mówi: ${last}`
+  if (/TypeError: 'NoneType'/.test(last))
+    return 'Coś jest puste (None) — np. funkcja nie oddała wyniku przez return.'
   if ((m = last.match(/TypeError: (.*)/)))
     return `Zły typ danych: ${m[1]}`
   return fallback
@@ -100,7 +73,7 @@ async function executeCode(code: string, levelId: number): Promise<ExecutionResu
   const bridgeCode = buildPythonBridge(levelId)
 
   try {
-    const fullCode = bridgeCode + code + '\n' + RESULT_EXTRACTOR
+    const fullCode = bridgeCode + `\n_run(${JSON.stringify(code)})\n` + RESULT_EXTRACTOR
 
     const resultPromise = pyodide.runPythonAsync(fullCode)
 

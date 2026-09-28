@@ -9,6 +9,10 @@ export interface Level {
   hints: string[]
   /** "Check the AI's code" mission: the starter code is an AI's buggy attempt. */
   ai?: boolean
+  /** Reaching the goal isn't enough: the code must also use this (regex source). */
+  requires?: { pattern: string; message: string }
+  /** What print() must output, line by line (trimmed). */
+  expectedOutput?: string
   grid: {
     width: number
     height: number
