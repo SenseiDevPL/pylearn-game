@@ -24,6 +24,7 @@ export default function App() {
   const [image, setImage] = useState<string | null>(null)
   const [folder, setFolder] = useState<string[] | null>(null)
   const [outbox, setOutbox] = useState<string[]>([])
+  const [fetched, setFetched] = useState<string[]>([])
 
   const currentLevel = levels[currentLevelIdx]
   const isWorkTask = !currentLevel.grid
@@ -40,6 +41,7 @@ export default function App() {
     setImage(null)
     setFolder(null)
     setOutbox([])
+    setFetched([])
   }, [currentLevel])
 
   const handleRun = useCallback(async () => {
@@ -56,6 +58,7 @@ export default function App() {
       setImage(result.image ?? null)
       setFolder(result.files ?? null)
       setOutbox(result.outbox ?? [])
+      setFetched(result.requests ?? [])
 
       if (!result.success) {
         setGameState('failure')
@@ -146,6 +149,7 @@ export default function App() {
     setImage(null)
     setFolder(null)
     setOutbox([])
+    setFetched([])
     gameRef.current?.resetLevel()
   }, [currentLevel])
 
@@ -204,7 +208,36 @@ export default function App() {
           </div>
           {isWorkTask && (
             <div className="w-full aspect-[4/3] rounded-xl border border-slate-700/50 bg-slate-900/60 flex items-center justify-center overflow-hidden">
-              {currentLevel.files || currentLevel.expectedOutbox ? (
+              {image ? (
+                <img src={`data:image/png;base64,${image}`} alt="Wykres z twojego kodu" className="max-w-full max-h-full bg-white" />
+              ) : currentLevel.pages ? (
+                <div className="w-full h-full overflow-auto p-4 space-y-3 text-sm">
+                  <div className="text-slate-400 text-xs font-semibold uppercase tracking-wider">🌐 Strony w (udawanym) internecie</div>
+                  {Object.entries(currentLevel.pages).map(([url, page]) => (
+                    <details key={url} className="bg-slate-800/50 rounded-lg border border-slate-700/50">
+                      <summary className="cursor-pointer px-3 py-2 font-mono text-sky-300 break-all">
+                        {url}
+                        {typeof page === 'object' && 'status' in page && <span className="text-red-400"> (błąd {page.status})</span>}
+                      </summary>
+                      <pre className="px-3 pb-3 text-xs text-slate-300 whitespace-pre-wrap break-all max-h-48 overflow-auto">
+                        {typeof page === 'string' ? page : 'json' in page ? JSON.stringify(page.json, null, 2) : page.body}
+                      </pre>
+                    </details>
+                  ))}
+                  <div className="text-slate-500 text-xs">Kliknij adres, żeby zobaczyć źródło strony — tak jak „Zbadaj element” w przeglądarce.</div>
+                  {fetched.length > 0 && (
+                    <div>
+                      <div className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">📥 Twój kod pobrał</div>
+                      {fetched.map((u, i) => (
+                        <div key={i} className="font-mono text-xs text-slate-200 py-0.5 break-all">
+                          {i + 1}. {u}
+                          {!currentLevel.pages?.[u] && <span className="text-red-400"> → 404</span>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : currentLevel.files || currentLevel.expectedOutbox ? (
                 <div className="w-full h-full overflow-auto p-4 space-y-4 font-mono text-sm">
                   {currentLevel.files && (
                     <div>
@@ -230,8 +263,6 @@ export default function App() {
                     </div>
                   )}
                 </div>
-              ) : image ? (
-                <img src={`data:image/png;base64,${image}`} alt="Wykres z twojego kodu" className="max-w-full max-h-full bg-white" />
               ) : currentLevel.preview ? (
                 <div className="w-full h-full overflow-auto p-4">
                   <div className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">📄 {currentLevel.preview.title}</div>

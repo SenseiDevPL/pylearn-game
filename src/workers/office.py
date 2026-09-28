@@ -1,5 +1,5 @@
-# "Python w pracy" office tools: a fresh folder of files for every run and a
-# fake mail server. The student's code uses the real modules (os, shutil,
+# "Python w pracy" office tools: a fresh folder of files for every run, a
+# fake mail server and a fake internet (requests). The student's code uses the real modules (os, shutil,
 # pathlib, email, smtplib) — only smtplib is swapped, so nothing leaves the
 # browser; sent mail lands in _outbox for the "📤 Wysłane" panel.
 #
@@ -73,6 +73,57 @@ class _SMTP:
         pass
 
 
+# --- fake internet: requests.get() answers from the level's "pages" ---
+# A page is HTML text (status 200), {"json": data} for an API, or
+# {"status": 503, "body": "..."} for a broken site. Unknown URL -> 404.
+_requests_log = []
+_sleeps = []
+
+
+class _HTTPError(Exception):
+    pass
+
+
+class _Response:
+    def __init__(self, url, status_code, text):
+        self.url = url
+        self.status_code = status_code
+        self.text = text
+        self.ok = status_code < 400
+
+    def json(self):
+        return _json.loads(self.text)
+
+    def raise_for_status(self):
+        if not self.ok:
+            raise _HTTPError(f"{self.status_code} Error dla adresu {self.url}")
+
+
+def _get(url, params=None, headers=None, timeout=None, **kwargs):
+    if params:
+        from urllib.parse import urlencode
+        url += ("&" if "?" in url else "?") + urlencode(params)
+    _requests_log.append(url)
+    page = _setup.get("pages", {}).get(url)
+    if page is None:
+        return _Response(url, 404, "<h1>404 Nie znaleziono</h1>")
+    if isinstance(page, str):
+        return _Response(url, 200, page)
+    if "json" in page:
+        return _Response(url, 200, _json.dumps(page["json"], ensure_ascii=False))
+    return _Response(url, page["status"], page.get("body", ""))
+
+
+_requests = _types.ModuleType("requests")
+_requests.get = _get
+_requests.HTTPError = _HTTPError
+_requests.exceptions = _types.SimpleNamespace(HTTPError=_HTTPError)
+_sys.modules["requests"] = _requests
+
+# Politeness pauses are recorded, not waited: the game has no time to lose.
+import time as _time
+_time.sleep = _sleeps.append
+
 _smtplib = _types.ModuleType("smtplib")
 _smtplib.SMTP = _SMTP
 _smtplib.SMTP_SSL = _SMTP
@@ -112,6 +163,9 @@ def _verify():
             with open(full, encoding="utf-8") as f:
                 if f.read().strip() != content.strip():
                     problems.append(f"Plik {path} ma inną treść, niż powinien:\n{content.strip()}")
+    wanted = _setup.get("expectedRequests")
+    if wanted is not None and _requests_log != wanted:
+        problems.append("Pobrane strony nie zgadzają się z zadaniem. Powinno być:\n- " + "\n- ".join(wanted))
     outbox = _setup.get("expectedOutbox")
     if outbox is not None and [_mail_line(m) for m in _outbox] != outbox:
         problems.append("Wysłane maile nie zgadzają się z zadaniem. Powinno być:\n- " + ("\n- ".join(outbox) or "(żadnego maila)"))

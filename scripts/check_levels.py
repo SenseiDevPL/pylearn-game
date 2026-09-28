@@ -21,7 +21,7 @@ WORKDIR = tempfile.mkdtemp(prefix="pylearn-check-") + "/praca"
 
 def setup_of(level):
     s = {"env": level.get("env", {}), "expectedFileContents": level.get("expectedFileContents", {})}
-    for key in ("files", "expectedFiles", "expectedOutbox"):
+    for key in ("files", "expectedFiles", "expectedOutbox", "pages", "expectedRequests"):
         if key in level:
             s[key] = level[key]
     return s

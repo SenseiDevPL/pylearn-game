@@ -26,6 +26,10 @@ export interface Level {
   expectedFileContents?: Record<string, string>
   /** Sent mail, one line each: "to | subject" (+ " | 📎 attachments"). */
   expectedOutbox?: string[]
+  /** Fake internet: URL → HTML, {json} or {status, body}. */
+  pages?: Record<string, string | { json: unknown } | { status: number; body?: string }>
+  /** Every URL the code must fetch, in order (and nothing else). */
+  expectedRequests?: string[]
   /** Missing grid = a "Python w pracy" task: no board, judged by console output. */
   grid?: {
     width: number
@@ -48,6 +52,8 @@ export interface ExecutionResult {
   /** Work folder after the run (paths), when the level has one. */
   files?: string[] | null
   outbox?: string[]
+  /** URLs fetched with requests.get, in order. */
+  requests?: string[]
   /** Unmet file/mail expectations, in Polish. */
   problems?: string[]
 }

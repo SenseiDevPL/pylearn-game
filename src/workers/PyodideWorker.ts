@@ -37,7 +37,11 @@ const levels = levelsData as Level[]
 const NO_BOARD = { width: 1, height: 1, playerStart: { x: 0, y: 0 }, goal: { x: 0, y: 0 }, walls: [], items: [] }
 
 // Importing pandas takes seconds in Pyodide; do it before the run timer starts.
-const PACKAGE_IMPORTS: Record<string, string> = { pandas: 'import pandas', matplotlib: 'import matplotlib.pyplot' }
+const PACKAGE_IMPORTS: Record<string, string> = {
+  pandas: 'import pandas',
+  matplotlib: 'import matplotlib.pyplot',
+  beautifulsoup4: 'import bs4',
+}
 const loadedPackages = new Set<string>()
 
 async function ensurePackages(names: string[]) {
@@ -60,6 +64,8 @@ function buildPythonBridge(levelId: number): string {
     ...(level?.expectedFiles && { expectedFiles: level.expectedFiles }),
     expectedFileContents: level?.expectedFileContents ?? {},
     ...(level?.expectedOutbox && { expectedOutbox: level.expectedOutbox }),
+    ...(level?.pages && { pages: level.pages }),
+    ...(level?.expectedRequests && { expectedRequests: level.expectedRequests }),
   }
   return (
     `_LEVEL_JSON = ${JSON.stringify(JSON.stringify(level?.grid ?? NO_BOARD))}\n_level_id = ${levelId}\n` +
@@ -86,6 +92,7 @@ _json.dumps({
     "image": _image,
     "files": _workspace_files(),
     "outbox": [_mail_line(m) for m in _outbox],
+    "requests": _requests_log,
     "problems": _verify()
 })
 `
@@ -99,13 +106,17 @@ function explainPythonError(raw: string, fallback: string): string {
   if ((m = last.match(/AttributeError: '(\w+)' object has no attribute '(\w+)'/)))
     return `${m[1]} nie ma czegoś takiego jak ${m[2]} — AI mogło to zmyślić albo pomylić z inną biblioteką. Sprawdź nazwę.`
   if ((m = last.match(/KeyError: '?(?:Column not found: )?([^']*)'?/)))
-    return `Nie ma kolumny (ani klucza) o nazwie ${m[1]} — zajrzyj do danych i sprawdź nazwę litera po literze.`
+    return `Nie ma kolumny (ani klucza) o nazwie '${m[1]}' — zajrzyj do danych i sprawdź nazwę litera po literze (też spacje!).`
   if ((m = last.match(/ValueError: could not convert string to float: '([^']*)'/)))
-    return `Nie da się zamienić tekstu '${m[1]}' na liczbę — sprawdź dane (przecinek zamiast kropki? pusty wpis?).`
+    return `Nie da się zamienić tekstu '${m[1]}' na liczbę — usuń z niego spacje i „zł”, a przecinek zamień na kropkę (albo to pusty wpis).`
   if ((m = last.match(/NameError: name '(\w+)' is not defined/)))
     return `Nie znam nazwy ${m[1]} — literówka albo zmienna nie została utworzona.`
   if (/_TOO_MANY_COMMANDS/.test(last))
     return 'Za dużo ruchów (ponad 1000) — prawdopodobnie pętla, która nigdy się nie kończy.'
+  if ((m = last.match(/HTTPError: (\d+)/)))
+    return `Strona odpowiedziała błędem ${m[1]} — nie działa albo nie ma jej pod tym adresem.`
+  if (/(min|max)\(\) (arg is an empty sequence|iterable argument is empty)/.test(last))
+    return 'Szukasz najmniejszej/największej wartości w PUSTEJ liście — kod niczego nie znalazł na stronie. Sprawdź, czego szukasz.'
   if (/SMTPAuthenticationError/.test(last))
     return 'Serwer poczty odrzucił login albo hasło — hasło jest złe albo nieaktualne.'
   if ((m = last.match(/FileNotFoundError: .*?'([^']+)'/)))
@@ -146,6 +157,7 @@ async function executeCode(code: string, levelId: number): Promise<ExecutionResu
       image: string
       files: string[] | null
       outbox: string[]
+      requests: string[]
       problems: string[]
     }
 
@@ -160,6 +172,7 @@ async function executeCode(code: string, levelId: number): Promise<ExecutionResu
       image: parsed.image || undefined,
       files: parsed.files,
       outbox: parsed.outbox,
+      requests: parsed.requests,
       problems: parsed.problems,
     }
   } catch (err) {

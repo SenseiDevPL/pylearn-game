@@ -1645,5 +1645,185 @@
       "Błąd 2: podsumowanie pokazuje 0 zł — zajrzyj do glob: *.cvs to literówka, pliki mają rozszerzenie .csv.",
       "Błąd 3: szef ma adres szef@firma.pl, a nie .com."
     ]
+  },
+  {
+    "id": 81,
+    "title": "Pierwsze pobranie strony",
+    "description": "Python potrafi „otworzyć” stronę jak przeglądarka, tylko zamiast ją pokazać — oddaje jej treść do dalszej obróbki. NOWOŚĆ: requests.get(adres) pobiera stronę. r.status_code to kod odpowiedzi (200 = wszystko OK, 404 = nie ma takiej strony), a r.text to cała treść strony jako tekst. W grze internet jest udawany — kliknij adres po lewej, żeby zobaczyć źródło strony.",
+    "objective": "Pobierz stronę główną sklepu, wypisz Status: kod, a jeśli w treści jest słowo Promocja — wypisz: Jest promocja!",
+    "starterCode": "import requests\n\nadres = \"https://sklep.przyklad.pl/\"\n\n# 1. pobierz stronę i wypisz: Status: ...\n# 2. jeśli \"Promocja\" jest w tekście strony -> wypisz: Jest promocja!\n",
+    "solution": "import requests\n\nadres = \"https://sklep.przyklad.pl/\"\n\nr = requests.get(adres)\nprint(f\"Status: {r.status_code}\")\nif \"Promocja\" in r.text:\n    print(\"Jest promocja!\")\n",
+    "expectedCommands": [],
+    "pages": {"https://sklep.przyklad.pl/": "<html>\n<head><title>Sklep Przykład — kawa i herbata</title></head>\n<body>\n  <h1>Witaj w Sklepie Przykład</h1>\n  <p class=\"promo\">Promocja: -20% na wszystkie kawy!</p>\n</body>\n</html>"},
+    "expectedRequests": ["https://sklep.przyklad.pl/"],
+    "expectedOutput": "Status: 200\nJest promocja!",
+    "hints": [
+      "r = requests.get(adres)",
+      "print(f\"Status: {r.status_code}\")",
+      "if \"Promocja\" in r.text: print(\"Jest promocja!\")"
+    ]
+  },
+  {
+    "id": 82,
+    "title": "Wyciąganie nagłówków (BeautifulSoup)",
+    "description": "Strona to tekst ze znacznikami: <title> to tytuł, <h2> to nagłówek. Szukanie w tym ręcznie jest męczące, więc używa się BeautifulSoup — „łyżki do zupy” z HTML. NOWOŚĆ: soup = BeautifulSoup(r.text, \"html.parser\"), potem soup.title.string to tytuł strony, a soup.find_all(\"h2\") daje listę wszystkich nagłówków h2. .text wyciąga sam tekst ze znacznika.",
+    "objective": "Wypisz tytuł strony z kawami, a pod nim nazwy wszystkich kaw (nagłówki h2).",
+    "starterCode": "import requests\nfrom bs4 import BeautifulSoup\n\nr = requests.get(\"https://sklep.przyklad.pl/kawy\")\n\n# 1. zrób zupę: soup = BeautifulSoup(r.text, \"html.parser\")\n# 2. wypisz tytuł strony, a potem tekst każdego h2\n",
+    "solution": "import requests\nfrom bs4 import BeautifulSoup\n\nr = requests.get(\"https://sklep.przyklad.pl/kawy\")\n\nsoup = BeautifulSoup(r.text, \"html.parser\")\nprint(soup.title.string)\nfor naglowek in soup.find_all(\"h2\"):\n    print(naglowek.text)\n",
+    "expectedCommands": [],
+    "packages": ["beautifulsoup4"],
+    "pages": {"https://sklep.przyklad.pl/kawy": "<html>\n<head><title>Kawy</title></head>\n<body>\n  <h1>Nasze kawy</h1>\n  <div class=\"produkt\"><h2>Kawa Brazylia</h2><span class=\"cena\">39,99 zł</span></div>\n  <div class=\"produkt\"><h2>Kawa Etiopia</h2><span class=\"cena\">45,50 zł</span></div>\n  <div class=\"produkt\"><h2>Kawa Kolumbia</h2><span class=\"cena\">36,00 zł</span></div>\n</body>\n</html>"},
+    "requires": { "pattern": "find_all\\(", "message": "znajdź nagłówki przez soup.find_all(\"h2\")." },
+    "expectedOutput": "Kawy\nKawa Brazylia\nKawa Etiopia\nKawa Kolumbia",
+    "hints": [
+      "soup = BeautifulSoup(r.text, \"html.parser\")",
+      "print(soup.title.string)",
+      "for naglowek in soup.find_all(\"h2\"): print(naglowek.text)"
+    ]
+  },
+  {
+    "id": 83,
+    "title": "Ceny z katalogu",
+    "description": "Każdy produkt siedzi w swoim pudełku <div class=\"produkt\">, a w środku ma nazwę <h2> i cenę <span class=\"cena\">. NOWOŚĆ: find_all(\"div\", class_=\"produkt\") daje pudełka, a pudelko.find(\"span\", class_=\"cena\") szuka W ŚRODKU jednego pudełka. Cena to tekst \"39,99 zł\" — żeby liczyć, trzeba usunąć „ zł” i zamienić przecinek na kropkę: float(tekst.replace(\" zł\", \"\").replace(\",\", \".\")).",
+    "objective": "Wypisz każdą kawę z ceną jako liczbą (Kawa Brazylia: 39.99 zł), a na końcu najtańszą: Najtańsza: nazwa (cena zł)",
+    "starterCode": "import requests\nfrom bs4 import BeautifulSoup\n\nr = requests.get(\"https://sklep.przyklad.pl/kawy\")\nsoup = BeautifulSoup(r.text, \"html.parser\")\n\n# Dla każdego div.produkt: nazwa z h2, cena ze span.cena (zamień na liczbę)\n",
+    "solution": "import requests\nfrom bs4 import BeautifulSoup\n\nr = requests.get(\"https://sklep.przyklad.pl/kawy\")\nsoup = BeautifulSoup(r.text, \"html.parser\")\n\nnajtansza = None\nfor produkt in soup.find_all(\"div\", class_=\"produkt\"):\n    nazwa = produkt.find(\"h2\").text\n    cena = float(produkt.find(\"span\", class_=\"cena\").text.replace(\" zł\", \"\").replace(\",\", \".\"))\n    print(f\"{nazwa}: {cena:.2f} zł\")\n    if najtansza is None or cena < najtansza[1]:\n        najtansza = (nazwa, cena)\nprint(f\"Najtańsza: {najtansza[0]} ({najtansza[1]:.2f} zł)\")\n",
+    "expectedCommands": [],
+    "packages": ["beautifulsoup4"],
+    "pages": {"https://sklep.przyklad.pl/kawy": "<html>\n<head><title>Kawy</title></head>\n<body>\n  <h1>Nasze kawy</h1>\n  <div class=\"produkt\"><h2>Kawa Brazylia</h2><span class=\"cena\">39,99 zł</span></div>\n  <div class=\"produkt\"><h2>Kawa Etiopia</h2><span class=\"cena\">45,50 zł</span></div>\n  <div class=\"produkt\"><h2>Kawa Kolumbia</h2><span class=\"cena\">36,00 zł</span></div>\n</body>\n</html>"},
+    "expectedOutput": "Kawa Brazylia: 39.99 zł\nKawa Etiopia: 45.50 zł\nKawa Kolumbia: 36.00 zł\nNajtańsza: Kawa Kolumbia (36.00 zł)",
+    "hints": [
+      "for produkt in soup.find_all(\"div\", class_=\"produkt\"):",
+      "nazwa = produkt.find(\"h2\").text; cena = float(produkt.find(\"span\", class_=\"cena\").text.replace(\" zł\", \"\").replace(\",\", \".\"))",
+      "Zapamiętuj najtańszą: if najtansza is None or cena < najtansza[1]: najtansza = (nazwa, cena)"
+    ]
+  },
+  {
+    "id": 84,
+    "title": "Wiele stron katalogu",
+    "description": "Sklepy dzielą katalog na strony: ?strona=1, ?strona=2… NOWOŚĆ: requests.get(adres, params={\"strona\": n}) sam dokleja ?strona=n do adresu. Pętla po numerach stron zbierze wszystko do jednej listy. Kliknij adresy po lewej — każda strona ma inne herbaty.",
+    "objective": "Zbierz ceny ze stron 1–3 katalogu herbat i wypisz: Produktów: 6 oraz Średnia cena: ... zł (dwa miejsca po kropce).",
+    "starterCode": "import requests\nfrom bs4 import BeautifulSoup\n\nadres = \"https://sklep.przyklad.pl/herbata\"\n\n# Dla stron 1, 2, 3: pobierz (params={\"strona\": n}), zbierz ceny ze span.cena do jednej listy\n",
+    "solution": "import requests\nfrom bs4 import BeautifulSoup\n\nadres = \"https://sklep.przyklad.pl/herbata\"\n\nceny = []\nfor n in range(1, 4):\n    r = requests.get(adres, params={\"strona\": n})\n    soup = BeautifulSoup(r.text, \"html.parser\")\n    for c in soup.find_all(\"span\", class_=\"cena\"):\n        ceny.append(float(c.text.replace(\" zł\", \"\").replace(\",\", \".\")))\nprint(f\"Produktów: {len(ceny)}\")\nprint(f\"Średnia cena: {sum(ceny) / len(ceny):.2f} zł\")\n",
+    "expectedCommands": [],
+    "packages": ["beautifulsoup4"],
+    "pages": {"https://sklep.przyklad.pl/herbata?strona=1": "<html>\n<body>\n  <h1>Herbaty — strona 1 z 3</h1>\n  <div class=\"produkt\"><h2>Earl Grey</h2><span class=\"cena\">12,00 zł</span></div>\n  <div class=\"produkt\"><h2>Zielona</h2><span class=\"cena\">15,50 zł</span></div>\n</body>\n</html>", "https://sklep.przyklad.pl/herbata?strona=2": "<html>\n<body>\n  <h1>Herbaty — strona 2 z 3</h1>\n  <div class=\"produkt\"><h2>Rooibos</h2><span class=\"cena\">9,90 zł</span></div>\n  <div class=\"produkt\"><h2>Matcha</h2><span class=\"cena\">22,00 zł</span></div>\n</body>\n</html>", "https://sklep.przyklad.pl/herbata?strona=3": "<html>\n<body>\n  <h1>Herbaty — strona 3 z 3</h1>\n  <div class=\"produkt\"><h2>Biała</h2><span class=\"cena\">18,60 zł</span></div>\n  <div class=\"produkt\"><h2>Miętowa</h2><span class=\"cena\">11,00 zł</span></div>\n</body>\n</html>"},
+    "expectedRequests": ["https://sklep.przyklad.pl/herbata?strona=1", "https://sklep.przyklad.pl/herbata?strona=2", "https://sklep.przyklad.pl/herbata?strona=3"],
+    "requires": { "pattern": "params\\s*=", "message": "podawaj numer strony przez params={\"strona\": n}." },
+    "expectedOutput": "Produktów: 6\nŚrednia cena: 14.83 zł",
+    "hints": [
+      "for n in range(1, 4): r = requests.get(adres, params={\"strona\": n})",
+      "W środku: for c in soup.find_all(\"span\", class_=\"cena\"): ceny.append(float(...))",
+      "Średnia: sum(ceny) / len(ceny)"
+    ]
+  },
+  {
+    "id": 85,
+    "title": "Kurs euro z API",
+    "description": "Wiele serwisów daje dane nie jako stronę dla ludzi, tylko jako API — czyste dane dla programów, w formacie JSON. Tak działa np. prawdziwe API Narodowego Banku Polskiego z kursami walut (w grze kurs jest przykładowy). NOWOŚĆ: r.json() zamienia odpowiedź na słowniki i listy Pythona — bez żadnego BeautifulSoup. Kliknij adres po lewej i zobacz, jak zbudowane są dane.",
+    "objective": "Pobierz kurs euro, wypisz: 1 EUR = 4.2731 zł, a potem przelicz fakturę 1200 EUR na złotówki (dwa miejsca po kropce).",
+    "starterCode": "import requests\n\nadres = \"https://api.nbp.pl/api/exchangerates/rates/a/eur/?format=json\"\nfaktura_eur = 1200\n\n# 1. dane = requests.get(adres).json()\n# 2. kurs jest w dane[\"rates\"][0][\"mid\"]\n# 3. wypisz: 1 EUR = ... zł  oraz  Faktura 1200 EUR = ... zł\n",
+    "solution": "import requests\n\nadres = \"https://api.nbp.pl/api/exchangerates/rates/a/eur/?format=json\"\nfaktura_eur = 1200\n\ndane = requests.get(adres).json()\nkurs = dane[\"rates\"][0][\"mid\"]\nprint(f\"1 EUR = {kurs} zł\")\nprint(f\"Faktura {faktura_eur} EUR = {faktura_eur * kurs:.2f} zł\")\n",
+    "expectedCommands": [],
+    "pages": {"https://api.nbp.pl/api/exchangerates/rates/a/eur/?format=json": {"json": {"table": "A", "currency": "euro", "code": "EUR", "rates": [{"no": "189/A/NBP/2026", "effectiveDate": "2026-09-29", "mid": 4.2731}]}}},
+    "requires": { "pattern": "\\.json\\(\\)", "message": "odczytaj dane z API przez .json()." },
+    "expectedOutput": "1 EUR = 4.2731 zł\nFaktura 1200 EUR = 5127.72 zł",
+    "hints": [
+      "dane = requests.get(adres).json()",
+      "rates to lista — pierwszy element: dane[\"rates\"][0], a w nim \"mid\".",
+      "print(f\"Faktura {faktura_eur} EUR = {faktura_eur * kurs:.2f} zł\")"
+    ]
+  },
+  {
+    "id": 86,
+    "title": "Monitoring cen konkurencji",
+    "description": "Prawdziwe zlecenie: „sprawdzaj ceny konkurencji i pokaż średnie na wykresie”. Łączysz wszystko: pobranie strony, wyciągnięcie tabeli (wiersze <tr>, komórki <td>), tabelę pandas i wykres. [1:] pomija pierwszy wiersz — nagłówki. Uwaga prawna: przed pobieraniem cudzej strony sprawdź jej regulamin — o tym więcej w następnych misjach.",
+    "objective": "Wyciągnij cennik konkurencji do tabeli pandas, wypisz średnią cenę w każdej kategorii (kategoria: ... zł) i narysuj wykres słupkowy.",
+    "starterCode": "import requests\nfrom bs4 import BeautifulSoup\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\nr = requests.get(\"https://konkurent.przyklad.pl/cennik\")\nsoup = BeautifulSoup(r.text, \"html.parser\")\n\n# 1. dla każdego wiersza tabeli (bez nagłówka): kategoria, produkt, cena (liczba)\n# 2. pd.DataFrame(wiersze), średnia ceny w każdej kategorii\n# 3. wypisz i narysuj słupki\n",
+    "solution": "import requests\nfrom bs4 import BeautifulSoup\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\nr = requests.get(\"https://konkurent.przyklad.pl/cennik\")\nsoup = BeautifulSoup(r.text, \"html.parser\")\n\nwiersze = []\nfor tr in soup.find_all(\"tr\")[1:]:\n    komorki = [td.text for td in tr.find_all(\"td\")]\n    wiersze.append({\"kategoria\": komorki[0], \"produkt\": komorki[1], \"cena\": float(komorki[2].replace(\",\", \".\"))})\ndf = pd.DataFrame(wiersze)\nsrednie = df.groupby(\"kategoria\")[\"cena\"].mean()\nfor kategoria, cena in srednie.items():\n    print(f\"{kategoria}: {cena:.2f} zł\")\nplt.bar(srednie.index, srednie.values)\nplt.title(\"Średnie ceny konkurencji\")\n",
+    "expectedCommands": [],
+    "packages": ["beautifulsoup4", "pandas", "matplotlib"],
+    "pages": {"https://konkurent.przyklad.pl/cennik": "<html>\n<body>\n<h1>Cennik</h1>\n<table id=\"cennik\">\n  <tr><th>kategoria</th><th>produkt</th><th>cena</th></tr>\n  <tr><td>kawa</td><td>Brazylia</td><td>41,00</td></tr>\n  <tr><td>kawa</td><td>Etiopia</td><td>47,00</td></tr>\n  <tr><td>herbata</td><td>Earl Grey</td><td>14,00</td></tr>\n  <tr><td>herbata</td><td>Zielona</td><td>12,00</td></tr>\n  <tr><td>herbata</td><td>Rooibos</td><td>16,00</td></tr>\n</table>\n</body>\n</html>"},
+    "requires": { "pattern": "DataFrame\\(", "message": "włóż dane do tabeli: pd.DataFrame(wiersze)." },
+    "expectedOutput": "herbata: 14.00 zł\nkawa: 44.00 zł",
+    "hints": [
+      "for tr in soup.find_all(\"tr\")[1:]: komorki = [td.text for td in tr.find_all(\"td\")]",
+      "wiersze.append({\"kategoria\": komorki[0], \"produkt\": komorki[1], \"cena\": float(komorki[2].replace(\",\", \".\"))})",
+      "df = pd.DataFrame(wiersze); srednie = df.groupby(\"kategoria\")[\"cena\"].mean()"
+    ]
+  },
+  {
+    "id": 87,
+    "title": "AI zgaduje wygląd strony",
+    "ai": true,
+    "description": "AI nie widzi strony, którą każesz mu przeszukać — ZGADUJE, jak jest zbudowana. Tu założyło, że ceny siedzą w span class=\"cena\", bo tak było w poprzednim sklepie. Kod nic nie znajduje. Zasada: zawsze zajrzyj do źródła strony (kliknij adres po lewej) i porównaj z kodem AI.",
+    "objective": "Uruchom, przeczytaj błąd, zajrzyj do źródła strony i popraw kod tak, żeby znalazł ceny.",
+    "starterCode": "import requests\nfrom bs4 import BeautifulSoup\n\nr = requests.get(\"https://sklep.przyklad.pl/czekolady\")\nsoup = BeautifulSoup(r.text, \"html.parser\")\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"znajdź najtańszą czekoladę\"\n# Odpowiedź AI: \"Gotowe, znalazłem ceny!\"\nceny = []\nfor c in soup.find_all(\"span\", class_=\"cena\"):\n    ceny.append(float(c.text.replace(\" zł\", \"\").replace(\",\", \".\")))\nprint(f\"Najtańsza czekolada: {min(ceny):.2f} zł\")\n",
+    "solution": "import requests\nfrom bs4 import BeautifulSoup\n\nr = requests.get(\"https://sklep.przyklad.pl/czekolady\")\nsoup = BeautifulSoup(r.text, \"html.parser\")\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"znajdź najtańszą czekoladę\"\n# Odpowiedź AI: \"Gotowe, znalazłem ceny!\"\nceny = []\nfor c in soup.find_all(\"span\", class_=\"price\"):\n    ceny.append(float(c.text.replace(\" zł\", \"\").replace(\",\", \".\")))\nprint(f\"Najtańsza czekolada: {min(ceny):.2f} zł\")\n",
+    "expectedCommands": [],
+    "packages": ["beautifulsoup4"],
+    "pages": {"https://sklep.przyklad.pl/czekolady": "<html>\n<body>\n  <h1>Czekolady</h1>\n  <div class=\"item\"><h3>Gorzka 70%</h3><span class=\"price\">8,49 zł</span></div>\n  <div class=\"item\"><h3>Mleczna z orzechami</h3><span class=\"price\">12,90 zł</span></div>\n  <div class=\"item\"><h3>Biała</h3><span class=\"price\">6,99 zł</span></div>\n</body>\n</html>"},
+    "expectedOutput": "Najtańsza czekolada: 6.99 zł",
+    "hints": [
+      "Błąd mówi, że lista cen jest pusta — kod niczego nie znalazł.",
+      "Kliknij adres strony po lewej: jak naprawdę nazywa się klasa ceny?",
+      "class_=\"cena\" zamień na class_=\"price\"."
+    ]
+  },
+  {
+    "id": 88,
+    "title": "Zero złotych, czyli awaria",
+    "ai": true,
+    "description": "Strony czasem nie działają: przerwa techniczna, przeciążenie. AI nie sprawdziło kodu odpowiedzi, sparsowało stronę z komunikatem o awarii i wpisało „0 zł” — w raporcie wygląda to jak super promocja! Zawsze sprawdzaj r.status_code (200 = OK), zanim uwierzysz w dane.",
+    "objective": "Gdy sklep nie odpowiada kodem 200, wypisz: Sklep B: niedostępny (błąd 503) zamiast fałszywej ceny.",
+    "starterCode": "import requests\nfrom bs4 import BeautifulSoup\n\nsklepy = {\"Sklep A\": \"https://sklep-a.przyklad.pl/kawa-brazylia\", \"Sklep B\": \"https://sklep-b.przyklad.pl/kawa-brazylia\"}\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"porównaj cenę Kawy Brazylia w sklepach\"\n# Odpowiedź AI: \"Porównanie gotowe!\"\nfor nazwa, adres in sklepy.items():\n    r = requests.get(adres)\n    soup = BeautifulSoup(r.text, \"html.parser\")\n    cena = soup.find(\"span\", class_=\"cena\")\n    print(f\"{nazwa}: {cena.text if cena else '0 zł'}\")\n",
+    "solution": "import requests\nfrom bs4 import BeautifulSoup\n\nsklepy = {\"Sklep A\": \"https://sklep-a.przyklad.pl/kawa-brazylia\", \"Sklep B\": \"https://sklep-b.przyklad.pl/kawa-brazylia\"}\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"porównaj cenę Kawy Brazylia w sklepach\"\n# Odpowiedź AI: \"Porównanie gotowe!\"\nfor nazwa, adres in sklepy.items():\n    r = requests.get(adres)\n    if r.status_code != 200:\n        print(f\"{nazwa}: niedostępny (błąd {r.status_code})\")\n        continue\n    soup = BeautifulSoup(r.text, \"html.parser\")\n    cena = soup.find(\"span\", class_=\"cena\")\n    print(f\"{nazwa}: {cena.text if cena else '0 zł'}\")\n",
+    "expectedCommands": [],
+    "packages": ["beautifulsoup4"],
+    "pages": {"https://sklep-a.przyklad.pl/kawa-brazylia": "<html>\n<body>\n  <h1>Kawa Brazylia</h1>\n  <span class=\"cena\">39,99 zł</span>\n</body>\n</html>", "https://sklep-b.przyklad.pl/kawa-brazylia": {"status": 503, "body": "<html><body><h1>Przerwa techniczna</h1><p>Wracamy wkrótce!</p></body></html>"}},
+    "requires": { "pattern": "status_code", "message": "sprawdzaj r.status_code, zanim odczytasz cenę." },
+    "expectedOutput": "Sklep A: 39,99 zł\nSklep B: niedostępny (błąd 503)",
+    "hints": [
+      "Sklep B naprawdę kosztuje 0 zł? Kliknij jego adres po lewej.",
+      "Po requests.get: if r.status_code != 200: ... continue",
+      "print(f\"{nazwa}: niedostępny (błąd {r.status_code})\")"
+    ]
+  },
+  {
+    "id": 89,
+    "title": "Grzeczny robot",
+    "ai": true,
+    "description": "Etyka i prawo: każda strona ma plik robots.txt z zasadami dla robotów — czego NIE wolno pobierać. AI go zignorowało, wzięło też listę klientów (dane osobowe!) i pobiera strony bez przerwy, co może przeciążyć serwer. NOWOŚĆ: RobotFileParser z biblioteki Pythona czyta robots.txt, a rp.can_fetch(\"*\", adres) mówi, czy wolno. time.sleep(1) robi sekundę przerwy między stronami.",
+    "objective": "Najpierw wczytaj robots.txt, pobieraj tylko dozwolone adresy (dla zakazanych wypisz: Pomijam: adres) i rób przerwę time.sleep(1) po każdej stronie.",
+    "starterCode": "import requests\nimport time\nfrom urllib.robotparser import RobotFileParser\n\nSKLEP = \"https://sklep.przyklad.pl\"\nadresy = [f\"{SKLEP}/produkt/1\", f\"{SKLEP}/produkt/2\", f\"{SKLEP}/produkt/3\", f\"{SKLEP}/klienci/lista\"]\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zbierz opisy produktów ze sklepu\"\n# Odpowiedź AI: \"Pobrałem wszystko, co się dało!\"\nfor adres in adresy:\n    r = requests.get(adres)\n    print(f\"Pobrano: {adres}\")\n",
+    "solution": "import requests\nimport time\nfrom urllib.robotparser import RobotFileParser\n\nSKLEP = \"https://sklep.przyklad.pl\"\nadresy = [f\"{SKLEP}/produkt/1\", f\"{SKLEP}/produkt/2\", f\"{SKLEP}/produkt/3\", f\"{SKLEP}/klienci/lista\"]\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zbierz opisy produktów ze sklepu\"\n# Odpowiedź AI: \"Pobrałem wszystko, co się dało!\"\nrp = RobotFileParser()\nrp.parse(requests.get(f\"{SKLEP}/robots.txt\").text.splitlines())\nfor adres in adresy:\n    if not rp.can_fetch(\"*\", adres):\n        print(f\"Pomijam: {adres}\")\n        continue\n    r = requests.get(adres)\n    print(f\"Pobrano: {adres}\")\n    time.sleep(1)\n",
+    "expectedCommands": [],
+    "pages": {"https://sklep.przyklad.pl/robots.txt": "User-agent: *\nDisallow: /klienci/", "https://sklep.przyklad.pl/produkt/1": "<html><body><h1>Produkt 1</h1><p class=\"opis\">Opis produktu 1</p></body></html>", "https://sklep.przyklad.pl/produkt/2": "<html><body><h1>Produkt 2</h1><p class=\"opis\">Opis produktu 2</p></body></html>", "https://sklep.przyklad.pl/produkt/3": "<html><body><h1>Produkt 3</h1><p class=\"opis\">Opis produktu 3</p></body></html>", "https://sklep.przyklad.pl/klienci/lista": "<html><body><h1>Lista klientów</h1><p>Anna Kowalska, tel. 500 000 001, ul. Przykładowa 1</p></body></html>"},
+    "expectedRequests": ["https://sklep.przyklad.pl/robots.txt", "https://sklep.przyklad.pl/produkt/1", "https://sklep.przyklad.pl/produkt/2", "https://sklep.przyklad.pl/produkt/3"],
+    "requires": { "pattern": "time\\.sleep\\(", "message": "rób przerwę między stronami: time.sleep(1)." },
+    "expectedOutput": "Pobrano: https://sklep.przyklad.pl/produkt/1\nPobrano: https://sklep.przyklad.pl/produkt/2\nPobrano: https://sklep.przyklad.pl/produkt/3\nPomijam: https://sklep.przyklad.pl/klienci/lista",
+    "hints": [
+      "rp = RobotFileParser(); rp.parse(requests.get(f\"{SKLEP}/robots.txt\").text.splitlines())",
+      "W pętli: if not rp.can_fetch(\"*\", adres): print(f\"Pomijam: {adres}\"); continue",
+      "Po każdym pobraniu: time.sleep(1)"
+    ]
+  },
+  {
+    "id": 90,
+    "title": "Wielki finał: strażnik cen",
+    "ai": true,
+    "description": "Finał: automat, który codziennie sprawdza konkurencję i mówi, gdzie jest TAŃSZA od nas. AI mówi „przetestowałem, działa”, a są trzy błędy: cena „1 299,00 zł” nie zamienia się na liczbę, nazwy ze strony mają niewidoczne spacje na końcu (nie pasują do naszego słownika), a porównanie jest odwrócone. Poprawiaj po jednym i uruchamiaj po każdej poprawce.",
+    "objective": "Wypisz produkty, które konkurencja ma TANIEJ niż my: Konkurencja taniej: nazwa (ich cena zł zamiast nasza cena zł). Znajdź i popraw 3 błędy AI.",
+    "starterCode": "import requests\nfrom bs4 import BeautifulSoup\n\n# Nasze ceny:\nnasze = {\"Ekspres Alfa\": 1349.00, \"Ekspres Beta\": 899.00, \"Ekspres Gamma\": 2199.00}\n\nr = requests.get(\"https://konkurent.przyklad.pl/ekspresy\")\nsoup = BeautifulSoup(r.text, \"html.parser\")\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"pokaż, gdzie konkurencja jest tańsza od nas\"\n# Odpowiedź AI: \"Przetestowałem, działa!\"\nfor p in soup.find_all(\"div\", class_=\"produkt\"):\n    nazwa = p.find(\"h2\").text\n    cena = float(p.find(\"span\", class_=\"cena\").text)\n    if cena > nasze[nazwa]:\n        print(f\"Konkurencja taniej: {nazwa} ({cena:.2f} zł zamiast {nasze[nazwa]:.2f} zł)\")\n",
+    "solution": "import requests\nfrom bs4 import BeautifulSoup\n\n# Nasze ceny:\nnasze = {\"Ekspres Alfa\": 1349.00, \"Ekspres Beta\": 899.00, \"Ekspres Gamma\": 2199.00}\n\nr = requests.get(\"https://konkurent.przyklad.pl/ekspresy\")\nsoup = BeautifulSoup(r.text, \"html.parser\")\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"pokaż, gdzie konkurencja jest tańsza od nas\"\n# Odpowiedź AI: \"Przetestowałem, działa!\"\nfor p in soup.find_all(\"div\", class_=\"produkt\"):\n    nazwa = p.find(\"h2\").text.strip()\n    cena = float(p.find(\"span\", class_=\"cena\").text.replace(\"zł\", \"\").replace(\" \", \"\").replace(\",\", \".\"))\n    if cena < nasze[nazwa]:\n        print(f\"Konkurencja taniej: {nazwa} ({cena:.2f} zł zamiast {nasze[nazwa]:.2f} zł)\")\n",
+    "expectedCommands": [],
+    "packages": ["beautifulsoup4"],
+    "pages": {"https://konkurent.przyklad.pl/ekspresy": "<html>\n<body>\n  <h1>Ekspresy do kawy</h1>\n  <div class=\"produkt\"><h2>Ekspres Alfa </h2><span class=\"cena\">1 299,00 zł</span></div>\n  <div class=\"produkt\"><h2>Ekspres Beta </h2><span class=\"cena\">949,00 zł</span></div>\n  <div class=\"produkt\"><h2>Ekspres Gamma </h2><span class=\"cena\">2 099,00 zł</span></div>\n</body>\n</html>"},
+    "expectedOutput": "Konkurencja taniej: Ekspres Alfa (1299.00 zł zamiast 1349.00 zł)\nKonkurencja taniej: Ekspres Gamma (2099.00 zł zamiast 2199.00 zł)",
+    "hints": [
+      "Błąd 1: tekst \"1 299,00 zł\" — usuń „zł” i spacje, przecinek zamień na kropkę, dopiero potem float().",
+      "Błąd 2: nazwa ze strony ma spację na końcu (widać w błędzie 'Ekspres Alfa '). Dodaj .strip().",
+      "Błąd 3: „taniej” to cena < nasze[nazwa], a nie >."
+    ]
   }
 ]
