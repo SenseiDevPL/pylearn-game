@@ -81,8 +81,8 @@ function explainPythonError(raw: string, fallback: string): string {
     return `Gracz nie zna komendy player.${m[1]}() — taka komenda nie istnieje. Dostępne: move, turn_left, turn_right, collect, say.`
   if ((m = last.match(/AttributeError: '(\w+)' object has no attribute '(\w+)'/)))
     return `${m[1]} nie ma czegoś takiego jak ${m[2]} — AI mogło to zmyślić albo pomylić z inną biblioteką. Sprawdź nazwę.`
-  if ((m = last.match(/KeyError: '?([^']*)'?/)))
-    return `Nie ma klucza/kolumny ${m[1]} — sprawdź nazwę dokładnie, litera po literze.`
+  if ((m = last.match(/KeyError: '?(?:Column not found: )?([^']*)'?/)))
+    return `Nie ma kolumny (ani klucza) o nazwie ${m[1]} — zajrzyj do danych i sprawdź nazwę litera po literze.`
   if ((m = last.match(/ValueError: could not convert string to float: '([^']*)'/)))
     return `Nie da się zamienić tekstu '${m[1]}' na liczbę — sprawdź dane (przecinek zamiast kropki? pusty wpis?).`
   if ((m = last.match(/NameError: name '(\w+)' is not defined/)))

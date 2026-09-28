@@ -15,6 +15,8 @@ export interface Level {
   expectedOutput?: string
   /** Python-libraries this level needs, loaded on demand (e.g. pandas, matplotlib). */
   packages?: string[]
+  /** Table shown where the board would be, so the student sees the data they work on. */
+  preview?: { title: string; columns: string[]; rows: (string | number)[][] }
   /** Missing grid = a "Python w pracy" task: no board, judged by console output. */
   grid?: {
     width: number

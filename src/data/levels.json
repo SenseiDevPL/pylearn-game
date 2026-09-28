@@ -1120,6 +1120,7 @@
     "expectedCommands": [],
     "requires": { "pattern": "\\.strip\\(\\)[\\s\\S]*\\.title\\(\\)|\\.title\\(\\)[\\s\\S]*\\.strip\\(\\)", "message": "wyczyść tekst metodami strip() i title()." },
     "expectedOutput": "Anna Kowalska\nEwa Zielińska\nJan Nowak\nPiotr Wiśniewski",
+    "preview": {"title": "Lista klientów (tak, jak ją wpisano)", "columns": ["klient"], "rows": [["'  anna KOWALSKA'"], ["'jan nowak  '"], ["'EWA zielińska'"], ["' piotr wiśniewski'"]]},
     "hints": [
       "Zrób pustą listę czyste = [] i w pętli dopisuj czyste.append(...).",
       "Wyczyszczone nazwisko: k.strip().title()",
@@ -1136,6 +1137,7 @@
     "expectedCommands": [],
     "requires": { "pattern": "sum\\([\\s\\S]*len\\(|len\\([\\s\\S]*sum\\(", "message": "policz przez sum(...) i len(...), a nie ręcznie." },
     "expectedOutput": "Suma: 6000 zł\nŚrednia: 1200.00 zł",
+    "preview": {"title": "Sprzedaż w tygodniu (zł)", "columns": ["dzień", "sprzedaż"], "rows": [["pon", 1200], ["wt", 850], ["śr", 1430], ["czw", 990], ["pt", 1530]]},
     "hints": [
       "suma = sum(sprzedaz)",
       "srednia = suma / len(sprzedaz)",
@@ -1152,6 +1154,7 @@
     "expectedCommands": [],
     "requires": { "pattern": "\\.items\\(\\)", "message": "przejdź po słowniku pętlą for produkt, ile in sprzedaz.items():" },
     "expectedOutput": "Najlepiej sprzedaje się: kawa (340 szt.)",
+    "preview": {"title": "Sprzedane sztuki", "columns": ["produkt", "sztuki"], "rows": [["kawa", 340], ["herbata", 120], ["czekolada", 275], ["ciastka", 190]]},
     "hints": [
       "Zacznij od: najlepszy = \"\" i najwiecej = 0",
       "for produkt, ile in sprzedaz.items(): — jeśli ile > najwiecej, zapamiętaj oba.",
@@ -1168,6 +1171,7 @@
     "expectedCommands": [],
     "requires": { "pattern": "DictReader", "message": "czytaj dane przez csv.DictReader." },
     "expectedOutput": "Wiersze: 4\nRazem: 39.90 zł",
+    "preview": {"title": "Plik CSV", "columns": ["data", "produkt", "kwota"], "rows": [["2026-09-01", "kawa", "12.50"], ["2026-09-01", "herbata", "8.00"], ["2026-09-02", "kawa", "12.50"], ["2026-09-02", "ciastka", "6.90"]]},
     "hints": [
       "for wiersz in csv.DictReader(io.StringIO(dane)):",
       "Kwota to tekst: float(wiersz[\"kwota\"])",
@@ -1185,6 +1189,7 @@
     "packages": ["pandas"],
     "requires": { "pattern": "groupby\\(", "message": "użyj df.groupby(\"miasto\") — jak tabeli przestawnej." },
     "expectedOutput": "Warszawa: 400 zł\nGdańsk: 200 zł\nKraków: 150 zł",
+    "preview": {"title": "Sprzedaż w miastach", "columns": ["miasto", "kwota"], "rows": [["Gdańsk", "120"], ["Warszawa", "300"], ["Gdańsk", "80"], ["Kraków", "150"], ["Warszawa", "100"]]},
     "hints": [
       "wynik = df.groupby(\"miasto\")[\"kwota\"].sum()",
       "Dołóż na końcu: .sort_values(ascending=False)",
@@ -1202,6 +1207,7 @@
     "packages": ["matplotlib"],
     "requires": { "pattern": "plt\\.bar\\(", "message": "narysuj wykres słupkowy: plt.bar(miesiace, sprzedaz)" },
     "expectedOutput": "Wzrost: 1800 zł",
+    "preview": {"title": "Sprzedaż w kwartale (zł)", "columns": ["miesiąc", "sprzedaż"], "rows": [["lip", 4200], ["sie", 5100], ["wrz", 6000]]},
     "hints": [
       "plt.bar(miesiace, sprzedaz)",
       "plt.title(\"Sprzedaż w kwartale\")",
@@ -1218,6 +1224,7 @@
     "solution": "# Wpłaty z formularza — przychodzą jako tekst\nwplaty = [\"120.50\", \"80\", \"99.50\"]\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"policz sumę wpłat\"\n# Odpowiedź AI: \"Gotowe!\"\nsuma = 0\nfor w in wplaty:\n    suma = suma + float(w)\nprint(f\"Suma wpłat: {suma} zł\")\n",
     "expectedCommands": [],
     "expectedOutput": "Suma wpłat: 300.0 zł",
+    "preview": {"title": "Wpłaty z formularza (to tekst!)", "columns": ["wpłata"], "rows": [["\"120.50\""], ["\"80\""], ["\"99.50\""]]},
     "hints": [
       "Błąd mówi, że nie da się dodać liczby i tekstu.",
       "Tekst \"120.50\" zamienia na liczbę: float(\"120.50\")",
@@ -1234,6 +1241,7 @@
     "solution": "oceny = [\"5\", \"4\", \"\", \"3\", \"\"]   # puste = klient nie ocenił\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"policz średnią ocenę klientów\"\n# Odpowiedź AI: \"Pomijam puste, średnia gotowa\"\nsuma = 0\nile = 0\nfor o in oceny:\n    if o != \"\":\n        suma += int(o)\n        ile += 1\nsrednia = suma / ile\nprint(f\"Średnia ocena: {srednia:.1f}\")\n",
     "expectedCommands": [],
     "expectedOutput": "Średnia ocena: 4.0",
+    "preview": {"title": "Oceny klientów", "columns": ["ocena"], "rows": [["5"], ["4"], [""], ["3"], [""]]},
     "hints": [
       "Policz w głowie: (5 + 4 + 3) / 3 = ? A co wychodzi AI?",
       "len(oceny) liczy też puste wpisy.",
@@ -1251,6 +1259,7 @@
     "expectedCommands": [],
     "requires": { "pattern": "^(?![\\s\\S]*print\\(\\s*klienci\\s*\\))", "message": "nie wypisuj listy klientów — to dane osobowe." },
     "expectedOutput": "Liczba klientów: 3",
+    "preview": {"title": "Baza klientów (dane osobowe!)", "columns": ["imie", "email", "pesel"], "rows": [["Anna", "anna@przyklad.pl", "00000000001"], ["Jan", "jan@przyklad.pl", "00000000002"], ["Ewa", "ewa@przyklad.pl", "00000000003"]]},
     "hints": [
       "Zajrzyj do konsoli: co trafiłoby do szefa?",
       "E-maile i PESEL-e to dane osobowe — nie mogą być w raporcie.",
@@ -1268,10 +1277,194 @@
     "expectedCommands": [],
     "packages": ["pandas"],
     "expectedOutput": "kawa: 200.00 zł\nciastka: 34.50 zł\nherbata: 32.00 zł",
+    "preview": {"title": "Sprzedaż produktów", "columns": ["produkt", "sztuki", "cena"], "rows": [["kawa", "10", "12.5"], ["herbata", "4", "8.0"], ["kawa", "6", "12.5"], ["ciastka", "5", "6.9"]]},
     "hints": [
       "Błąd 1: group_by nie istnieje w pandas (to z biblioteki polars) — w pandas jest groupby.",
       "Błąd 2: przychód to sztuki RAZY cena, nie plus.",
       "Błąd 3: od największego — dołóż .sort_values(ascending=False)."
+    ]
+  },
+  {
+    "id": 61,
+    "title": "Kto nie zapłacił?",
+    "description": "Codzienność w każdej firmie: lista faktur i pytanie, kto zalega z płatnością. NOWOŚĆ: filtrowanie tabeli. df[warunek] zostawia tylko pasujące wiersze. Dwa warunki łączysz znakiem & (i) — każdy w osobnym nawiasie. Daty w formacie RRRR-MM-DD można porównywać jak zwykły tekst: \"2026-09-01\" < \"2026-09-29\". df.iterrows() przechodzi po wierszach tabeli.",
+    "objective": "Wypisz faktury niezapłacone po terminie (od największej kwoty), a na końcu sumę zaległości.",
+    "starterCode": "import pandas as pd\nimport io\n\ndane = \"\"\"faktura,klient,kwota,termin,zaplacona\nFV/01,Kowalski,1200,2026-09-10,tak\nFV/02,Nowak,850,2026-09-20,nie\nFV/03,Zielińska,2300,2026-10-05,nie\nFV/04,Wiśniewski,430,2026-09-01,nie\nFV/05,Lewandowska,990,2026-09-15,tak\n\"\"\"\ndf = pd.read_csv(io.StringIO(dane))\ndzisiaj = \"2026-09-29\"\n\n# Zaległe = zaplacona == \"nie\" ORAZ termin < dzisiaj\n# Wypisz: FV/.. Klient: kwota zł (od największej), potem: Razem zaległe: ... zł\n",
+    "solution": "import pandas as pd\nimport io\n\ndane = \"\"\"faktura,klient,kwota,termin,zaplacona\nFV/01,Kowalski,1200,2026-09-10,tak\nFV/02,Nowak,850,2026-09-20,nie\nFV/03,Zielińska,2300,2026-10-05,nie\nFV/04,Wiśniewski,430,2026-09-01,nie\nFV/05,Lewandowska,990,2026-09-15,tak\n\"\"\"\ndf = pd.read_csv(io.StringIO(dane))\ndzisiaj = \"2026-09-29\"\n\nzalegle = df[(df[\"zaplacona\"] == \"nie\") & (df[\"termin\"] < dzisiaj)]\nzalegle = zalegle.sort_values(\"kwota\", ascending=False)\nfor _, f in zalegle.iterrows():\n    print(f\"{f['faktura']} {f['klient']}: {f['kwota']} zł\")\nprint(f\"Razem zaległe: {zalegle['kwota'].sum()} zł\")\n",
+    "expectedCommands": [],
+    "packages": ["pandas"],
+    "requires": { "pattern": "&", "message": "połącz dwa warunki filtra znakiem & (niezapłacona ORAZ po terminie)." },
+    "expectedOutput": "FV/02 Nowak: 850 zł\nFV/04 Wiśniewski: 430 zł\nRazem zaległe: 1280 zł",
+    "preview": {"title": "Faktury", "columns": ["faktura", "klient", "kwota", "termin", "zaplacona"], "rows": [["FV/01", "Kowalski", "1200", "2026-09-10", "tak"], ["FV/02", "Nowak", "850", "2026-09-20", "nie"], ["FV/03", "Zielińska", "2300", "2026-10-05", "nie"], ["FV/04", "Wiśniewski", "430", "2026-09-01", "nie"], ["FV/05", "Lewandowska", "990", "2026-09-15", "tak"]]},
+    "hints": [
+      "Warunek 1: df[\"zaplacona\"] == \"nie\"; warunek 2: df[\"termin\"] < dzisiaj",
+      "zalegle = df[(warunek1) & (warunek2)].sort_values(\"kwota\", ascending=False)",
+      "for _, f in zalegle.iterrows(): print(...), a na końcu zalegle[\"kwota\"].sum()"
+    ]
+  },
+  {
+    "id": 62,
+    "title": "Doliczamy VAT",
+    "description": "Hurtownia podaje ceny netto, a klient płaci brutto (z 23% VAT). NOWOŚĆ: nowa kolumna liczona z innej — df[\"brutto\"] = df[\"netto\"] * 1.23 liczy od razu dla wszystkich wierszy, jak przeciągnięcie formuły w Excelu. .round(2) zaokrągla do groszy.",
+    "objective": "Dodaj kolumnę brutto (zaokrągloną do groszy), wypisz każdy produkt i sumę brutto.",
+    "starterCode": "import pandas as pd\nimport io\n\ndane = \"\"\"produkt,netto\nLaptop,3500\nMonitor,899.99\nMysz,49.9\n\"\"\"\ndf = pd.read_csv(io.StringIO(dane))\n\n# 1. kolumna brutto = netto * 1.23, zaokrąglona do 2 miejsc\n# 2. dla każdego produktu: Laptop: 4305.00 zł brutto\n# 3. na końcu: Razem brutto: ... zł\n",
+    "solution": "import pandas as pd\nimport io\n\ndane = \"\"\"produkt,netto\nLaptop,3500\nMonitor,899.99\nMysz,49.9\n\"\"\"\ndf = pd.read_csv(io.StringIO(dane))\n\ndf[\"brutto\"] = (df[\"netto\"] * 1.23).round(2)\nfor _, p in df.iterrows():\n    print(f\"{p['produkt']}: {p['brutto']:.2f} zł brutto\")\nprint(f\"Razem brutto: {df['brutto'].sum():.2f} zł\")\n",
+    "expectedCommands": [],
+    "packages": ["pandas"],
+    "requires": { "pattern": "df\\[\\s*[\\\"']brutto[\\\"']\\s*\\]\\s*=", "message": "dodaj nową kolumnę: df[\"brutto\"] = ..." },
+    "expectedOutput": "Laptop: 4305.00 zł brutto\nMonitor: 1106.99 zł brutto\nMysz: 61.38 zł brutto\nRazem brutto: 5473.37 zł",
+    "preview": {"title": "Cennik netto", "columns": ["produkt", "netto"], "rows": [["Laptop", "3500"], ["Monitor", "899.99"], ["Mysz", "49.9"]]},
+    "hints": [
+      "df[\"brutto\"] = (df[\"netto\"] * 1.23).round(2)",
+      "for _, p in df.iterrows(): print(f\"{p['produkt']}: {p['brutto']:.2f} zł brutto\")",
+      "Suma: df[\"brutto\"].sum()"
+    ]
+  },
+  {
+    "id": 63,
+    "title": "Ruch na stronie",
+    "description": "Właściciel sklepu chce wiedzieć, kiedy ludzie odwiedzają stronę — żeby wtedy puszczać reklamy. NOWOŚĆ: wykres liniowy plt.plot(x, y, marker=\"o\") pokazuje zmiany w czasie. max(lista) daje największą wartość, a lista.index(wartość) mówi, na którym miejscu ona stoi.",
+    "objective": "Narysuj wykres liniowy wizyt z tytułem i wypisz dzień z największym ruchem.",
+    "starterCode": "import matplotlib.pyplot as plt\n\ndni = [\"pon\", \"wt\", \"śr\", \"czw\", \"pt\", \"sob\", \"nd\"]\nwizyty = [320, 410, 380, 520, 610, 290, 250]\n\n# 1. wykres liniowy z kropkami i tytułem\n# 2. wypisz: Najwięcej wizyt: pt (610)\n",
+    "solution": "import matplotlib.pyplot as plt\n\ndni = [\"pon\", \"wt\", \"śr\", \"czw\", \"pt\", \"sob\", \"nd\"]\nwizyty = [320, 410, 380, 520, 610, 290, 250]\n\nplt.plot(dni, wizyty, marker=\"o\")\nplt.title(\"Wizyty w tygodniu\")\nnajwiecej = max(wizyty)\nnajlepszy = dni[wizyty.index(najwiecej)]\nprint(f\"Najwięcej wizyt: {najlepszy} ({najwiecej})\")\n",
+    "expectedCommands": [],
+    "packages": ["matplotlib"],
+    "requires": { "pattern": "plt\\.plot\\(", "message": "narysuj wykres liniowy: plt.plot(dni, wizyty, marker=\"o\")" },
+    "expectedOutput": "Najwięcej wizyt: pt (610)",
+    "preview": {"title": "Wizyty na stronie", "columns": ["dzień", "wizyty"], "rows": [["pon", 320], ["wt", 410], ["śr", 380], ["czw", 520], ["pt", 610], ["sob", 290], ["nd", 250]]},
+    "hints": [
+      "plt.plot(dni, wizyty, marker=\"o\") i plt.title(\"...\")",
+      "najwiecej = max(wizyty)",
+      "najlepszy = dni[wizyty.index(najwiecej)]"
+    ]
+  },
+  {
+    "id": 64,
+    "title": "Udział produktów",
+    "description": "Który produkt „robi” najwięcej sprzedaży? Najczytelniej pokazuje to wykres kołowy. NOWOŚĆ: plt.pie(wartości, labels=podpisy, autopct=\"%1.0f%%\") rysuje koło z procentami na kawałkach. Udział w procentach to: część / całość * 100.",
+    "objective": "Narysuj wykres kołowy sprzedaży i wypisz, jaki procent sprzedaży daje kawa (z jednym miejscem po kropce).",
+    "starterCode": "import matplotlib.pyplot as plt\n\nprodukty = [\"kawa\", \"herbata\", \"ciastka\", \"soki\"]\nsprzedaz = [5400, 1800, 2700, 1100]\n\n# 1. wykres kołowy z podpisami i procentami\n# 2. wypisz: Kawa to 49.1% sprzedaży\n",
+    "solution": "import matplotlib.pyplot as plt\n\nprodukty = [\"kawa\", \"herbata\", \"ciastka\", \"soki\"]\nsprzedaz = [5400, 1800, 2700, 1100]\n\nplt.pie(sprzedaz, labels=produkty, autopct=\"%1.0f%%\")\nplt.title(\"Udział w sprzedaży\")\nudzial = sprzedaz[0] / sum(sprzedaz) * 100\nprint(f\"Kawa to {udzial:.1f}% sprzedaży\")\n",
+    "expectedCommands": [],
+    "packages": ["matplotlib"],
+    "requires": { "pattern": "plt\\.pie\\(", "message": "narysuj wykres kołowy: plt.pie(sprzedaz, labels=produkty, autopct=\"%1.0f%%\")" },
+    "expectedOutput": "Kawa to 49.1% sprzedaży",
+    "preview": {"title": "Sprzedaż w zł", "columns": ["produkt", "sprzedaż"], "rows": [["kawa", 5400], ["herbata", 1800], ["ciastka", 2700], ["soki", 1100]]},
+    "hints": [
+      "plt.pie(sprzedaz, labels=produkty, autopct=\"%1.0f%%\")",
+      "udzial = sprzedaz[0] / sum(sprzedaz) * 100",
+      "print(f\"Kawa to {udzial:.1f}% sprzedaży\")"
+    ]
+  },
+  {
+    "id": 65,
+    "title": "Łączenie dwóch tabel",
+    "description": "Zamówienia są w jednej tabeli, a dane klientów (miasto) w drugiej. Łączy je wspólna kolumna id_klienta — w Excelu robi się to przez WYSZUKAJ.PIONOWO. NOWOŚĆ: pd.merge(z, k, on=\"id_klienta\") dokleja do każdego zamówienia dane jego klienta.",
+    "objective": "Połącz tabele, policz sprzedaż w każdym mieście (od największej), wypisz i narysuj wykres słupkowy.",
+    "starterCode": "import pandas as pd\nimport io\nimport matplotlib.pyplot as plt\n\nzamowienia = \"\"\"id_klienta,kwota\n1,300\n2,150\n1,200\n3,400\n2,50\n\"\"\"\nklienci = \"\"\"id_klienta,imie,miasto\n1,Anna,Gdańsk\n2,Jan,Kraków\n3,Ewa,Gdańsk\n\"\"\"\nz = pd.read_csv(io.StringIO(zamowienia))\nk = pd.read_csv(io.StringIO(klienci))\n\n# 1. połącz: razem = pd.merge(z, k, on=\"id_klienta\")\n# 2. suma kwot w każdym mieście, od największej\n# 3. wypisz: Gdańsk: 900 zł ... i narysuj słupki\n",
+    "solution": "import pandas as pd\nimport io\nimport matplotlib.pyplot as plt\n\nzamowienia = \"\"\"id_klienta,kwota\n1,300\n2,150\n1,200\n3,400\n2,50\n\"\"\"\nklienci = \"\"\"id_klienta,imie,miasto\n1,Anna,Gdańsk\n2,Jan,Kraków\n3,Ewa,Gdańsk\n\"\"\"\nz = pd.read_csv(io.StringIO(zamowienia))\nk = pd.read_csv(io.StringIO(klienci))\n\nrazem = pd.merge(z, k, on=\"id_klienta\")\nwynik = razem.groupby(\"miasto\")[\"kwota\"].sum().sort_values(ascending=False)\nfor miasto, suma in wynik.items():\n    print(f\"{miasto}: {suma} zł\")\nplt.bar(wynik.index, wynik.values)\nplt.title(\"Sprzedaż w miastach\")\n",
+    "expectedCommands": [],
+    "packages": ["pandas", "matplotlib"],
+    "requires": { "pattern": "merge\\(", "message": "połącz tabele przez pd.merge(z, k, on=\"id_klienta\")." },
+    "expectedOutput": "Gdańsk: 900 zł\nKraków: 200 zł",
+    "preview": {"title": "Zamówienia (klienci są w drugiej tabeli w kodzie)", "columns": ["id_klienta", "kwota"], "rows": [["1", "300"], ["2", "150"], ["1", "200"], ["3", "400"], ["2", "50"]]},
+    "hints": [
+      "razem = pd.merge(z, k, on=\"id_klienta\")",
+      "wynik = razem.groupby(\"miasto\")[\"kwota\"].sum().sort_values(ascending=False)",
+      "plt.bar(wynik.index, wynik.values)"
+    ]
+  },
+  {
+    "id": 66,
+    "title": "Raport miesięczny",
+    "description": "Sprzedaż zapisuje się z dokładną datą, a szef chce sumy miesięczne. NOWOŚĆ: pd.to_datetime(kolumna) zamienia tekst na prawdziwe daty, a .dt.strftime(\"%Y-%m\") wyciąga z daty rok i miesiąc, np. 2026-07. Potem wystarczy groupby po miesiącu.",
+    "objective": "Policz sprzedaż w każdym miesiącu, wypisz ją i narysuj wykres słupkowy.",
+    "starterCode": "import pandas as pd\nimport io\nimport matplotlib.pyplot as plt\n\ndane = \"\"\"data,kwota\n2026-07-03,1200\n2026-07-19,800\n2026-08-02,1500\n2026-08-25,700\n2026-09-10,2100\n2026-09-28,900\n\"\"\"\ndf = pd.read_csv(io.StringIO(dane))\n\n# 1. df[\"miesiac\"] = pd.to_datetime(df[\"data\"]).dt.strftime(\"%Y-%m\")\n# 2. suma kwot w każdym miesiącu\n# 3. wypisz: 2026-07: 2000 zł ... i narysuj słupki\n",
+    "solution": "import pandas as pd\nimport io\nimport matplotlib.pyplot as plt\n\ndane = \"\"\"data,kwota\n2026-07-03,1200\n2026-07-19,800\n2026-08-02,1500\n2026-08-25,700\n2026-09-10,2100\n2026-09-28,900\n\"\"\"\ndf = pd.read_csv(io.StringIO(dane))\n\ndf[\"miesiac\"] = pd.to_datetime(df[\"data\"]).dt.strftime(\"%Y-%m\")\nmiesiace = df.groupby(\"miesiac\")[\"kwota\"].sum()\nfor miesiac, suma in miesiace.items():\n    print(f\"{miesiac}: {suma} zł\")\nplt.bar(miesiace.index, miesiace.values)\nplt.title(\"Sprzedaż miesięczna\")\n",
+    "expectedCommands": [],
+    "packages": ["pandas", "matplotlib"],
+    "requires": { "pattern": "to_datetime\\(", "message": "zamień tekst na daty: pd.to_datetime(df[\"data\"])." },
+    "expectedOutput": "2026-07: 2000 zł\n2026-08: 2200 zł\n2026-09: 3000 zł",
+    "preview": {"title": "Sprzedaż dzienna", "columns": ["data", "kwota"], "rows": [["2026-07-03", "1200"], ["2026-07-19", "800"], ["2026-08-02", "1500"], ["2026-08-25", "700"], ["2026-09-10", "2100"], ["2026-09-28", "900"]]},
+    "hints": [
+      "df[\"miesiac\"] = pd.to_datetime(df[\"data\"]).dt.strftime(\"%Y-%m\")",
+      "miesiace = df.groupby(\"miesiac\")[\"kwota\"].sum()",
+      "Pętla po miesiace.items() i plt.bar(miesiace.index, miesiace.values)"
+    ]
+  },
+  {
+    "id": 67,
+    "title": "Zdublowane wiersze",
+    "ai": true,
+    "description": "Eksporty z systemów często dublują wiersze — i nikt tego nie widzi w długiej tabeli. AI policzyło wszystko jak leci i raport zawyża sprzedaż. NOWOŚĆ: df.drop_duplicates() usuwa powtórzone wiersze. Kontroler zawsze najpierw ogląda dane!",
+    "objective": "Spójrz na dane, znajdź problem i popraw raport tak, żeby liczył każde zamówienie raz.",
+    "starterCode": "import pandas as pd\nimport io\n\n# Eksport z systemu sklepu (system czasem wysyła wiersze dwa razy)\ndane = \"\"\"nr,klient,kwota\n101,Kowalski,500\n102,Nowak,300\n102,Nowak,300\n103,Zielińska,700\n101,Kowalski,500\n\"\"\"\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"ile mamy zamówień i na jaką kwotę?\"\n# Odpowiedź AI: \"Policzone!\"\ndf = pd.read_csv(io.StringIO(dane))\nprint(f\"Zamówień: {len(df)}\")\nprint(f\"Suma: {df['kwota'].sum()} zł\")\n",
+    "solution": "import pandas as pd\nimport io\n\n# Eksport z systemu sklepu (system czasem wysyła wiersze dwa razy)\ndane = \"\"\"nr,klient,kwota\n101,Kowalski,500\n102,Nowak,300\n102,Nowak,300\n103,Zielińska,700\n101,Kowalski,500\n\"\"\"\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"ile mamy zamówień i na jaką kwotę?\"\n# Odpowiedź AI: \"Policzone!\"\ndf = pd.read_csv(io.StringIO(dane))\ndf = df.drop_duplicates()\nprint(f\"Zamówień: {len(df)}\")\nprint(f\"Suma: {df['kwota'].sum()} zł\")\n",
+    "expectedCommands": [],
+    "packages": ["pandas"],
+    "requires": { "pattern": "drop_duplicates\\(", "message": "usuń powtórzone wiersze: df = df.drop_duplicates()" },
+    "expectedOutput": "Zamówień: 3\nSuma: 1500 zł",
+    "preview": {"title": "Eksport zamówień", "columns": ["nr", "klient", "kwota"], "rows": [["101", "Kowalski", "500"], ["102", "Nowak", "300"], ["102", "Nowak", "300"], ["103", "Zielińska", "700"], ["101", "Kowalski", "500"]]},
+    "hints": [
+      "Popatrz na tabelę z danymi: czy któryś numer zamówienia się powtarza?",
+      "Po wczytaniu dodaj: df = df.drop_duplicates()",
+      "Zamówień powinno być 3."
+    ]
+  },
+  {
+    "id": 68,
+    "title": "Puste to nie zero",
+    "ai": true,
+    "description": "Puste pole znaczy „nie wiemy”, a nie „zero”. AI „dla porządku” wpisało w puste pola 0 (fillna(0)) — i średnia godzin wyszła zaniżona, jakby Jan w ogóle nie pracował. pandas sam pomija puste pola przy liczeniu średniej.",
+    "objective": "Popraw tak, żeby średnia liczyła się tylko z pracowników, którzy wysłali raport.",
+    "starterCode": "import pandas as pd\nimport io\n\n# Jan jeszcze nie wysłał raportu godzin (puste pole)\ndane = \"\"\"pracownik,godziny\nAnna,160\nJan,\nEwa,150\nPiotr,170\n\"\"\"\ndf = pd.read_csv(io.StringIO(dane))\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"średnia liczba godzin w miesiącu\"\n# Odpowiedź AI: \"Uzupełniłem braki i policzyłem\"\ndf[\"godziny\"] = df[\"godziny\"].fillna(0)\nprint(f\"Średnio: {df['godziny'].mean():.1f} h\")\n",
+    "solution": "import pandas as pd\nimport io\n\n# Jan jeszcze nie wysłał raportu godzin (puste pole)\ndane = \"\"\"pracownik,godziny\nAnna,160\nJan,\nEwa,150\nPiotr,170\n\"\"\"\ndf = pd.read_csv(io.StringIO(dane))\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"średnia liczba godzin w miesiącu\"\n# Odpowiedź AI: \"Uzupełniłem braki i policzyłem\"\nprint(f\"Średnio: {df['godziny'].mean():.1f} h\")\n",
+    "expectedCommands": [],
+    "packages": ["pandas"],
+    "requires": { "pattern": "^(?![\\s\\S]*fillna\\(\\s*0\\s*\\))", "message": "nie wpisuj zera w puste pola — puste to „nie wiemy”, nie 0." },
+    "expectedOutput": "Średnio: 160.0 h",
+    "preview": {"title": "Godziny pracy", "columns": ["pracownik", "godziny"], "rows": [["Anna", "160"], ["Jan", ""], ["Ewa", "150"], ["Piotr", "170"]]},
+    "hints": [
+      "Policz w głowie: (160 + 150 + 170) / 3 = ?",
+      "Zero Jana ściąga średnią w dół.",
+      "Usuń linijkę z fillna(0)."
+    ]
+  },
+  {
+    "id": 69,
+    "title": "Wykres, który kłamie",
+    "ai": true,
+    "description": "AI zrobiło wykres „bardziej efektowny”: oś zaczyna się od 4000, więc słupek Q1 wygląda na maleńki, a wzrost na gigantyczny. To manipulacja — oś słupków musi zaczynać się od zera. Do tego AI źle policzyło wzrost procentowy: dzieli się przez wartość STARTOWĄ, nie końcową.",
+    "objective": "Zrób uczciwy wykres (bez przycinania osi) i popraw wzór na wzrost: (nowy - stary) / stary * 100.",
+    "starterCode": "import matplotlib.pyplot as plt\n\nkwartaly = [\"Q1\", \"Q2\", \"Q3\"]\nprzychod = [4200, 4600, 6000]\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"wykres przychodu i wzrost od Q1 do Q3 w procentach\"\n# Odpowiedź AI: \"Zrobiłem efektowny wykres!\"\nplt.bar(kwartaly, przychod)\nplt.ylim(4000, 6100)\nplt.title(\"Przychód\")\nwzrost = (przychod[-1] - przychod[0]) / przychod[-1] * 100\nprint(f\"Wzrost: {wzrost:.1f}%\")\n",
+    "solution": "import matplotlib.pyplot as plt\n\nkwartaly = [\"Q1\", \"Q2\", \"Q3\"]\nprzychod = [4200, 4600, 6000]\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"wykres przychodu i wzrost od Q1 do Q3 w procentach\"\n# Odpowiedź AI: \"Zrobiłem efektowny wykres!\"\nplt.bar(kwartaly, przychod)\nplt.title(\"Przychód\")\nwzrost = (przychod[-1] - przychod[0]) / przychod[0] * 100\nprint(f\"Wzrost: {wzrost:.1f}%\")\n",
+    "expectedCommands": [],
+    "packages": ["matplotlib"],
+    "requires": { "pattern": "^(?![\\s\\S]*plt\\.ylim\\()", "message": "usuń plt.ylim — przycięta oś wyolbrzymia różnice." },
+    "expectedOutput": "Wzrost: 42.9%",
+    "preview": {"title": "Przychód w zł", "columns": ["kwartał", "przychód"], "rows": [["Q1", 4200], ["Q2", 4600], ["Q3", 6000]]},
+    "hints": [
+      "Uruchom i popatrz na słupek Q1 — czy naprawdę jest taki mały w porównaniu z Q3?",
+      "Usuń linijkę plt.ylim(...).",
+      "Wzrost dzieli się przez wartość startową: / przychod[0]"
+    ]
+  },
+  {
+    "id": 70,
+    "title": "Wielki finał: raport dla zarządu",
+    "ai": true,
+    "description": "Finał: zarząd chce ranking handlowców za WRZESIEŃ, od najlepszego, z wykresem. AI mówi „przetestowałem, działa”, a w kodzie są trzy błędy: zmyślona nazwa kolumny, zły miesiąc w filtrze i odwrotne sortowanie. Poprawiaj po jednym i uruchamiaj po każdej poprawce.",
+    "objective": "Sprzedaż każdego handlowca we wrześniu 2026, od najlepszego, z wykresem. Znajdź i popraw 3 błędy AI.",
+    "starterCode": "import pandas as pd\nimport io\nimport matplotlib.pyplot as plt\n\ndane = \"\"\"handlowiec,data,kwota\nAnna,2026-09-02,1200\nJan,2026-09-05,800\nAnna,2026-09-12,900\nEwa,2026-09-15,1500\nJan,2026-09-20,1100\nEwa,2026-09-28,700\nAnna,2026-08-30,5000\n\"\"\"\ndf = pd.read_csv(io.StringIO(dane))\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"ranking handlowców za wrzesień, od najlepszego, z wykresem\"\n# Odpowiedź AI: \"Przetestowałem, działa!\"\nwrzesien = df[df[\"data\"].str.startswith(\"2026-08\")]\nwynik = wrzesien.groupby(\"handlowiec\")[\"wartosc\"].sum()\nwynik = wynik.sort_values()\nfor handlowiec, suma in wynik.items():\n    print(f\"{handlowiec}: {suma} zł\")\nplt.bar(wynik.index, wynik.values)\nplt.title(\"Sprzedaż we wrześniu\")\n",
+    "solution": "import pandas as pd\nimport io\nimport matplotlib.pyplot as plt\n\ndane = \"\"\"handlowiec,data,kwota\nAnna,2026-09-02,1200\nJan,2026-09-05,800\nAnna,2026-09-12,900\nEwa,2026-09-15,1500\nJan,2026-09-20,1100\nEwa,2026-09-28,700\nAnna,2026-08-30,5000\n\"\"\"\ndf = pd.read_csv(io.StringIO(dane))\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"ranking handlowców za wrzesień, od najlepszego, z wykresem\"\n# Odpowiedź AI: \"Przetestowałem, działa!\"\nwrzesien = df[df[\"data\"].str.startswith(\"2026-09\")]\nwynik = wrzesien.groupby(\"handlowiec\")[\"kwota\"].sum()\nwynik = wynik.sort_values(ascending=False)\nfor handlowiec, suma in wynik.items():\n    print(f\"{handlowiec}: {suma} zł\")\nplt.bar(wynik.index, wynik.values)\nplt.title(\"Sprzedaż we wrześniu\")\n",
+    "expectedCommands": [],
+    "packages": ["pandas", "matplotlib"],
+    "expectedOutput": "Ewa: 2200 zł\nAnna: 2100 zł\nJan: 1900 zł",
+    "preview": {"title": "Sprzedaż handlowców", "columns": ["handlowiec", "data", "kwota"], "rows": [["Anna", "2026-09-02", "1200"], ["Jan", "2026-09-05", "800"], ["Anna", "2026-09-12", "900"], ["Ewa", "2026-09-15", "1500"], ["Jan", "2026-09-20", "1100"], ["Ewa", "2026-09-28", "700"], ["Anna", "2026-08-30", "5000"]]},
+    "hints": [
+      "Błąd 1: kolumny wartosc nie ma w tabeli — zajrzyj do danych, jak się naprawdę nazywa.",
+      "Błąd 2: wrzesień to 2026-09, a nie 2026-08.",
+      "Błąd 3: od najlepszego = sort_values(ascending=False)."
     ]
   }
 ]

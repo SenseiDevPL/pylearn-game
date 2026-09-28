@@ -195,6 +195,31 @@ export default function App() {
             <div className="w-full aspect-[4/3] rounded-xl border border-slate-700/50 bg-slate-900/60 flex items-center justify-center overflow-hidden">
               {image ? (
                 <img src={`data:image/png;base64,${image}`} alt="Wykres z twojego kodu" className="max-w-full max-h-full bg-white" />
+              ) : currentLevel.preview ? (
+                <div className="w-full h-full overflow-auto p-4">
+                  <div className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">📄 {currentLevel.preview.title}</div>
+                  <table className="w-full text-sm font-mono border-collapse">
+                    <thead>
+                      <tr>
+                        {currentLevel.preview.columns.map((c) => (
+                          <th key={c} className="text-left text-amber-300 font-semibold border-b border-slate-600 px-2 py-1">{c}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentLevel.preview.rows.map((row, i) => (
+                        <tr key={i} className="odd:bg-slate-800/40">
+                          {row.map((cell, j) => (
+                            <td key={j} className="text-slate-200 px-2 py-1 whitespace-nowrap">{cell === '' ? <span className="text-slate-500 italic">(puste)</span> : cell}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {currentLevel.packages?.includes('matplotlib') && (
+                    <div className="text-slate-500 text-xs mt-3">📊 Po uruchomieniu w tym miejscu pojawi się twój wykres.</div>
+                  )}
+                </div>
               ) : (
                 <div className="text-center text-slate-500 text-sm px-6">
                   <div className="text-4xl mb-2">📊</div>
