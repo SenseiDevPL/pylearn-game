@@ -1825,5 +1825,178 @@
       "Błąd 2: nazwa ze strony ma spację na końcu (widać w błędzie 'Ekspres Alfa '). Dodaj .strip().",
       "Błąd 3: „taniej” to cena < nasze[nazwa], a nie >."
     ]
+  },
+  {
+    "id": 91,
+    "title": "Ile dni do terminu?",
+    "description": "Daty to chleb powszedni w biurze: terminy płatności, urlopy, umowy. NOWOŚĆ: moduł datetime. date.fromisoformat(\"2026-10-05\") zamienia tekst na prawdziwą datę. Daty można odejmować: (termin - dzis).days to liczba dni różnicy — ujemna, gdy termin już minął. W pracy „dziś” to date.today(); w grze data jest stała, żeby wynik się nie zmieniał.",
+    "objective": "Dla każdej faktury wypisz: za N dni / dziś! / po terminie N dni.",
+    "starterCode": "from datetime import date\n\ndzis = date(2026, 9, 29)   # w pracy: date.today()\nfaktury = {\"FV/01\": \"2026-10-05\", \"FV/02\": \"2026-09-20\", \"FV/03\": \"2026-09-29\"}\n\n# FV/01: za 6 dni\n# FV/02: po terminie 9 dni\n# FV/03: dziś!\n",
+    "solution": "from datetime import date\n\ndzis = date(2026, 9, 29)   # w pracy: date.today()\nfaktury = {\"FV/01\": \"2026-10-05\", \"FV/02\": \"2026-09-20\", \"FV/03\": \"2026-09-29\"}\n\nfor numer, tekst in faktury.items():\n    dni = (date.fromisoformat(tekst) - dzis).days\n    if dni > 0:\n        print(f\"{numer}: za {dni} dni\")\n    elif dni == 0:\n        print(f\"{numer}: dziś!\")\n    else:\n        print(f\"{numer}: po terminie {-dni} dni\")\n",
+    "expectedCommands": [],
+    "preview": {"title": "Terminy faktur (dziś: 2026-09-29)", "columns": ["faktura", "termin"], "rows": [["FV/01", "2026-10-05"], ["FV/02", "2026-09-20"], ["FV/03", "2026-09-29"]]},
+    "requires": { "pattern": "fromisoformat\\(", "message": "zamień tekst na datę przez date.fromisoformat(...)." },
+    "expectedOutput": "FV/01: za 6 dni\nFV/02: po terminie 9 dni\nFV/03: dziś!",
+    "hints": [
+      "for numer, tekst in faktury.items(): dni = (date.fromisoformat(tekst) - dzis).days",
+      "Trzy przypadki: if dni > 0 ... elif dni == 0 ... else ...",
+      "Po terminie liczba jest ujemna — wypisz -dni."
+    ]
+  },
+  {
+    "id": 92,
+    "title": "E-maile z tekstu",
+    "description": "Klient przysłał długiego maila, a ty potrzebujesz z niego samych adresów. NOWOŚĆ: wyrażenia regularne (moduł re) — wzorce do szukania w tekście. re.findall(wzorzec, tekst) zwraca listę wszystkich dopasowań. Wzorzec na adres e-mail: r\"[\\w.+-]+@[\\w-]+(?:\\.[\\w-]+)+\" — czyli: litery/kropki/plusy, małpa, domena z kropkami. Nie musisz go rozumieć w całości — w pracy takie wzorce się sprawdza i kopiuje.",
+    "objective": "Wyciągnij wszystkie adresy e-mail z tekstu i wypisz każdy w osobnej linii.",
+    "starterCode": "import re\n\ntekst = \"\"\"Proszę o kontakt: anna.kowalska@firma.pl lub biuro@sklep.com.pl.\nKopię faktury proszę wysłać na jan+faktury@poczta.pl, dziękuję!\"\"\"\n\n# wzorzec: r\"[\\w.+-]+@[\\w-]+(?:\\.[\\w-]+)+\"\n",
+    "solution": "import re\n\ntekst = \"\"\"Proszę o kontakt: anna.kowalska@firma.pl lub biuro@sklep.com.pl.\nKopię faktury proszę wysłać na jan+faktury@poczta.pl, dziękuję!\"\"\"\n\nfor adres in re.findall(r\"[\\w.+-]+@[\\w-]+(?:\\.[\\w-]+)+\", tekst):\n    print(adres)\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "re\\.findall\\(", "message": "szukaj przez re.findall(wzorzec, tekst)." },
+    "expectedOutput": "anna.kowalska@firma.pl\nbiuro@sklep.com.pl\njan+faktury@poczta.pl",
+    "hints": [
+      "re.findall(wzorzec, tekst) daje listę adresów.",
+      "Wzorzec skopiuj z komentarza — z literką r przed cudzysłowem.",
+      "for adres in re.findall(r\"...\", tekst): print(adres)"
+    ]
+  },
+  {
+    "id": 93,
+    "title": "Sprawdzanie formularza",
+    "description": "Ludzie wpisują w formularze byle co. Zanim zapiszesz dane, sprawdź, czy mają dobry kształt. NOWOŚĆ: re.fullmatch(wzorzec, tekst) sprawdza, czy CAŁY tekst pasuje do wzorca. Polski kod pocztowy to: 2 cyfry, myślnik, 3 cyfry — czyli wzorzec r\"\\d{2}-\\d{3}\" (\\d = cyfra, {2} = dwa razy).",
+    "objective": "Dla każdego kodu wypisz: kod: OK albo kod: błędny",
+    "starterCode": "import re\n\nkody = [\"80-001\", \"8000-1\", \"00-950\", \"ab-123\"]\n\n# wzorzec kodu pocztowego: r\"\\d{2}-\\d{3}\"\n",
+    "solution": "import re\n\nkody = [\"80-001\", \"8000-1\", \"00-950\", \"ab-123\"]\n\nfor kod in kody:\n    if re.fullmatch(r\"\\d{2}-\\d{3}\", kod):\n        print(f\"{kod}: OK\")\n    else:\n        print(f\"{kod}: błędny\")\n",
+    "expectedCommands": [],
+    "preview": {"title": "Kody z formularza", "columns": ["kod pocztowy"], "rows": [["80-001"], ["8000-1"], ["00-950"], ["ab-123"]]},
+    "requires": { "pattern": "re\\.fullmatch\\(", "message": "sprawdzaj cały kod przez re.fullmatch(...)." },
+    "expectedOutput": "80-001: OK\n8000-1: błędny\n00-950: OK\nab-123: błędny",
+    "hints": [
+      "for kod in kody: if re.fullmatch(r\"\\d{2}-\\d{3}\", kod): ...",
+      "fullmatch oddaje dopasowanie (prawda) albo None (fałsz).",
+      "else: print(f\"{kod}: błędny\")"
+    ]
+  },
+  {
+    "id": 94,
+    "title": "Raport, który otworzy polski Excel",
+    "description": "Klasyczna pułapka: zapisujesz tabelę do CSV, księgowa otwiera ją w Excelu — i wszystko jest w jednej kolumnie, a zamiast „ż” widzi krzaczki. Polski Excel oczekuje średników zamiast przecinków i specjalnego znacznika kodowania. NOWOŚĆ: df.to_csv(\"plik.csv\", sep=\";\", index=False, encoding=\"utf-8-sig\") zapisuje plik dokładnie tak, jak Excel lubi.",
+    "objective": "Zapisz tabelę do pliku raport.csv dla polskiego Excela (średniki, bez numerów wierszy, kodowanie utf-8-sig) i wypisz: Zapisano raport.csv",
+    "starterCode": "import pandas as pd\n\ndf = pd.DataFrame({\n    \"produkt\": [\"Kawa Brazylia\", \"Herbata zielona\", \"Czekolada gorzka\"],\n    \"sprzedaż\": [120, 85, 64],\n})\n\n# zapisz df do raport.csv: sep=\";\", index=False, encoding=\"utf-8-sig\"\n",
+    "solution": "import pandas as pd\n\ndf = pd.DataFrame({\n    \"produkt\": [\"Kawa Brazylia\", \"Herbata zielona\", \"Czekolada gorzka\"],\n    \"sprzedaż\": [120, 85, 64],\n})\n\ndf.to_csv(\"raport.csv\", sep=\";\", index=False, encoding=\"utf-8-sig\")\nprint(\"Zapisano raport.csv\")\n",
+    "expectedCommands": [],
+    "packages": ["pandas"],
+    "files": {},
+    "expectedFiles": ["raport.csv"],
+    "requires": { "pattern": "sep\\s*=\\s*[\\\"'];[\\\"'][\\s\\S]*utf-8-sig|utf-8-sig[\\s\\S]*sep\\s*=\\s*[\\\"'];[\\\"']", "message": "polski Excel potrzebuje sep=\";\" i encoding=\"utf-8-sig\"." },
+    "expectedOutput": "Zapisano raport.csv",
+    "hints": [
+      "df.to_csv(\"raport.csv\", ...)",
+      "Parametry: sep=\";\", index=False, encoding=\"utf-8-sig\"",
+      "Na końcu print(\"Zapisano raport.csv\")"
+    ]
+  },
+  {
+    "id": 95,
+    "title": "Zamówienie w pliku JSON",
+    "description": "JSON to format, w którym programy wymieniają się danymi — widziałeś go już w API z kursami walut. Zapisuje się w nim też ustawienia i zamówienia. NOWOŚĆ: json.dump(dane, plik, ensure_ascii=False, indent=2) zapisuje słownik do pliku (ensure_ascii=False = polskie litery zostają polskie, indent=2 = czytelne wcięcia), a json.load(plik) wczytuje go z powrotem.",
+    "objective": "Zapisz zamówienie do zamowienie.json, wczytaj je z powrotem i wypisz: Suma zamówienia: 97.49 zł",
+    "starterCode": "import json\n\nzamowienie = {\n    \"klient\": \"Anna Kowalska\",\n    \"produkty\": [\n        {\"nazwa\": \"Kawa Brazylia\", \"cena\": 39.99},\n        {\"nazwa\": \"Kawa Etiopia\", \"cena\": 45.5},\n        {\"nazwa\": \"Czekolada\", \"cena\": 12.0},\n    ],\n}\n\n# 1. zapisz do zamowienie.json (ensure_ascii=False, indent=2)\n# 2. wczytaj z pliku i policz sumę cen\n",
+    "solution": "import json\n\nzamowienie = {\n    \"klient\": \"Anna Kowalska\",\n    \"produkty\": [\n        {\"nazwa\": \"Kawa Brazylia\", \"cena\": 39.99},\n        {\"nazwa\": \"Kawa Etiopia\", \"cena\": 45.5},\n        {\"nazwa\": \"Czekolada\", \"cena\": 12.0},\n    ],\n}\n\nwith open(\"zamowienie.json\", \"w\", encoding=\"utf-8\") as f:\n    json.dump(zamowienie, f, ensure_ascii=False, indent=2)\n\nwith open(\"zamowienie.json\", encoding=\"utf-8\") as f:\n    wczytane = json.load(f)\nsuma = sum(p[\"cena\"] for p in wczytane[\"produkty\"])\nprint(f\"Suma zamówienia: {suma:.2f} zł\")\n",
+    "expectedCommands": [],
+    "files": {},
+    "expectedFiles": ["zamowienie.json"],
+    "requires": { "pattern": "json\\.dump\\([\\s\\S]*json\\.load\\(", "message": "zapisz przez json.dump(...), a potem wczytaj przez json.load(...)." },
+    "expectedOutput": "Suma zamówienia: 97.49 zł",
+    "hints": [
+      "with open(\"zamowienie.json\", \"w\", encoding=\"utf-8\") as f: json.dump(zamowienie, f, ensure_ascii=False, indent=2)",
+      "with open(\"zamowienie.json\", encoding=\"utf-8\") as f: wczytane = json.load(f)",
+      "suma = sum(p[\"cena\"] for p in wczytane[\"produkty\"])"
+    ]
+  },
+  {
+    "id": 96,
+    "title": "Kod, który sprawdza sam siebie",
+    "description": "Zawodowcy nie sprawdzają kodu „na oko” — piszą testy. NOWOŚĆ: assert warunek, \"opis\" zatrzymuje program z błędem, jeśli warunek nie jest prawdą. Testy już są napisane poniżej — twoja funkcja ma je wszystkie przejść. To podstawa pracy z AI: każesz AI napisać kod, a testy sprawdzają, czy AI nie kłamie. round(liczba, 2) zaokrągla do groszy.",
+    "objective": "Napisz funkcję brutto(netto), która dolicza 23% VAT i zaokrągla do groszy, tak żeby przeszły wszystkie testy.",
+    "starterCode": "def brutto(netto):\n    pass   # Twój kod: dolicz 23% VAT, zaokrąglij do groszy\n\n# Testy — sprawdzają, czy funkcja liczy dobrze:\nassert brutto(100) == 123.0, \"100 zł netto to 123 zł brutto\"\nassert brutto(0) == 0, \"0 zł netto to 0 zł brutto\"\nassert brutto(19.99) == 24.59, \"wynik ma być zaokrąglony do groszy\"\nprint(\"Wszystkie testy przeszły ✅\")\n",
+    "solution": "def brutto(netto):\n    return round(netto * 1.23, 2)\n\n# Testy — sprawdzają, czy funkcja liczy dobrze:\nassert brutto(100) == 123.0, \"100 zł netto to 123 zł brutto\"\nassert brutto(0) == 0, \"0 zł netto to 0 zł brutto\"\nassert brutto(19.99) == 24.59, \"wynik ma być zaokrąglony do groszy\"\nprint(\"Wszystkie testy przeszły ✅\")\n",
+    "expectedCommands": [],
+    "expectedOutput": "Wszystkie testy przeszły ✅",
+    "hints": [
+      "Uruchom — zobaczysz, który test nie przechodzi.",
+      "VAT 23%: netto * 1.23",
+      "return round(netto * 1.23, 2)"
+    ]
+  },
+  {
+    "id": 97,
+    "title": "Wzorzec, który gubi adresy",
+    "ai": true,
+    "description": "AI napisało wzorzec na e-maile „na szybko”: \\w+@\\w+\\.\\w+ — czyli litery, małpa, litery, kropka, litery. Wygląda dobrze na prostych adresach, ale ucina adresy z kropką w nazwie i domeny z dwiema kropkami. Z listy mailingowej znikają klienci, a nikt tego nie zauważa.",
+    "objective": "Uruchom, porównaj znalezione adresy z tekstem i popraw wzorzec tak, żeby znajdował całe adresy.",
+    "starterCode": "import re\n\ntekst = \"\"\"Proszę o kontakt: anna.kowalska@firma.pl lub biuro@sklep.com.pl.\nKopię faktury proszę wysłać na jan+faktury@poczta.pl, dziękuję!\"\"\"\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"wyciągnij adresy e-mail z tekstu\"\n# Odpowiedź AI: \"Gotowe, prosty wzorzec wystarczy!\"\nfor adres in re.findall(r\"\\w+@\\w+\\.\\w+\", tekst):\n    print(adres)\n",
+    "solution": "import re\n\ntekst = \"\"\"Proszę o kontakt: anna.kowalska@firma.pl lub biuro@sklep.com.pl.\nKopię faktury proszę wysłać na jan+faktury@poczta.pl, dziękuję!\"\"\"\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"wyciągnij adresy e-mail z tekstu\"\n# Odpowiedź AI: \"Gotowe, prosty wzorzec wystarczy!\"\nfor adres in re.findall(r\"[\\w.+-]+@[\\w-]+(?:\\.[\\w-]+)+\", tekst):\n    print(adres)\n",
+    "expectedCommands": [],
+    "expectedOutput": "anna.kowalska@firma.pl\nbiuro@sklep.com.pl\njan+faktury@poczta.pl",
+    "hints": [
+      "Porównaj: w tekście jest anna.kowalska@firma.pl, a co znalazło AI?",
+      "\\w to tylko litery i cyfry — bez kropek i plusów.",
+      "Użyj wzorca z misji 92: r\"[\\w.+-]+@[\\w-]+(?:\\.[\\w-]+)+\""
+    ]
+  },
+  {
+    "id": 98,
+    "title": "43 września",
+    "ai": true,
+    "description": "AI policzyło termin płatności „za 14 dni”, dodając 14 do numeru dnia. 29 + 14 = 43 — a takiego dnia nie ma. Kod działał na testach AI (na początku miesiąca), a wysypuje się pod koniec. Do dat dodaje się dni przez timedelta(days=14) — Python sam przejdzie na następny miesiąc.",
+    "objective": "Uruchom, przeczytaj błąd i popraw liczenie terminu. Wynik: Termin płatności: 2026-10-13",
+    "starterCode": "from datetime import date, timedelta\n\ndzis = date(2026, 9, 29)\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"termin płatności = dziś + 14 dni\"\n# Odpowiedź AI: \"Proste dodawanie, przetestowane!\"\ntermin = date(dzis.year, dzis.month, dzis.day + 14)\nprint(f\"Termin płatności: {termin}\")\n",
+    "solution": "from datetime import date, timedelta\n\ndzis = date(2026, 9, 29)\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"termin płatności = dziś + 14 dni\"\n# Odpowiedź AI: \"Proste dodawanie, przetestowane!\"\ntermin = dzis + timedelta(days=14)\nprint(f\"Termin płatności: {termin}\")\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "timedelta\\(", "message": "dodawaj dni przez timedelta(days=14)." },
+    "expectedOutput": "Termin płatności: 2026-10-13",
+    "hints": [
+      "Błąd mówi, że taki dzień nie istnieje.",
+      "29 + 14 = 43 — wrzesień ma 30 dni.",
+      "termin = dzis + timedelta(days=14)"
+    ]
+  },
+  {
+    "id": 99,
+    "title": "Błędy zamiecione pod dywan",
+    "ai": true,
+    "description": "Najgroźniejszy nawyk AI: try/except: pass — „jak coś wybuchnie, udawaj, że nic się nie stało”. Tu AI po cichu pominęło nie tylko śmieciowy wpis „brak”, ale też prawdziwą wpłatę „120,50” (z przecinkiem). Suma jest zaniżona, a nikt nie wie dlaczego. Błędy trzeba obsłużyć jawnie: zamienić przecinek na kropkę, a złe wpisy WYPISAĆ.",
+    "objective": "Popraw tak, żeby przecinek działał jak kropka, a złe wpisy były wypisane: Pominięto błędny wpis: brak — i na końcu Suma: 300.00 zł",
+    "starterCode": "wplaty = [\"120,50\", \"80\", \"brak\", \"99.50\"]   # z formularza: przecinki, kropki, śmieci\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zsumuj wpłaty, pomiń błędne\"\n# Odpowiedź AI: \"Zabezpieczyłem kod przed błędami!\"\nsuma = 0\nfor w in wplaty:\n    try:\n        suma += float(w)\n    except:\n        pass\nprint(f\"Suma: {suma:.2f} zł\")\n",
+    "solution": "wplaty = [\"120,50\", \"80\", \"brak\", \"99.50\"]   # z formularza: przecinki, kropki, śmieci\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"zsumuj wpłaty, pomiń błędne\"\n# Odpowiedź AI: \"Zabezpieczyłem kod przed błędami!\"\nsuma = 0\nfor w in wplaty:\n    try:\n        suma += float(w.replace(\",\", \".\"))\n    except ValueError:\n        print(f\"Pominięto błędny wpis: {w}\")\nprint(f\"Suma: {suma:.2f} zł\")\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "^(?![\\s\\S]*except\\s*:\\s*\\n\\s*pass)", "message": "nie zamiataj błędów: zamiast except: pass wypisz, co pominięto." },
+    "expectedOutput": "Pominięto błędny wpis: brak\nSuma: 300.00 zł",
+    "hints": [
+      "Policz w głowie: 120.50 + 80 + 99.50 = 300. Ile wyszło AI?",
+      "\"120,50\" ma przecinek — float(w.replace(\",\", \".\"))",
+      "except ValueError: print(f\"Pominięto błędny wpis: {w}\")"
+    ]
+  },
+  {
+    "id": 100,
+    "title": "Wielki finał gry: automat windykacyjny",
+    "ai": true,
+    "description": "Finał całej gry! Firma chce automatu: co rano czyta zamówienia z pliku, znajduje NIEZAPŁACONE PO TERMINIE i wysyła każdemu klientowi osobne przypomnienie z numerem zamówienia. AI mówi „przetestowałem, działa”, a są trzy błędy: daty w pliku są po polsku (20.09.2026), porównanie terminu jest odwrócone, a wszyscy dostają jeden wspólny mail (wyciek adresów — RODO). Zajrzyj do folderu, poprawiaj po jednym błędzie i uruchamiaj po każdej poprawce. Powodzenia, kontrolerze!",
+    "objective": "Każdy klient z niezapłaconym zamówieniem po terminie ma dostać OSOBNY mail z tematem Przypomnienie: numer zamówienia. Znajdź i popraw 3 błędy AI.",
+    "starterCode": "import os\nimport csv\nimport smtplib\nfrom datetime import date, datetime\nfrom email.message import EmailMessage\n\ndzis = date(2026, 9, 29)\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"przypomnienia dla klientów z niezapłaconymi zamówieniami po terminie\"\n# Odpowiedź AI: \"Przetestowałem, działa!\"\nzalegle = []\nwith open(\"zamowienia.csv\", encoding=\"utf-8\") as f:\n    for w in csv.DictReader(f):\n        termin = date.fromisoformat(w[\"termin\"])\n        if w[\"zaplacone\"] == \"nie\" and termin > dzis:\n            zalegle.append(w)\n\nwith smtplib.SMTP(\"smtp.firma.pl\", 587) as serwer:\n    serwer.starttls()\n    serwer.login(\"biuro@firma.pl\", os.environ[\"SMTP_HASLO\"])\n    msg = EmailMessage()\n    msg[\"From\"] = \"biuro@firma.pl\"\n    msg[\"To\"] = \", \".join(w[\"email\"] for w in zalegle)\n    msg[\"Subject\"] = \"Przypomnienie o płatności\"\n    msg.set_content(\"Prosimy o zapłatę zaległego zamówienia.\")\n    serwer.send_message(msg)\nprint(f\"Wysłano przypomnień: {len(zalegle)}\")\n",
+    "solution": "import os\nimport csv\nimport smtplib\nfrom datetime import date, datetime\nfrom email.message import EmailMessage\n\ndzis = date(2026, 9, 29)\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"przypomnienia dla klientów z niezapłaconymi zamówieniami po terminie\"\n# Odpowiedź AI: \"Przetestowałem, działa!\"\nzalegle = []\nwith open(\"zamowienia.csv\", encoding=\"utf-8\") as f:\n    for w in csv.DictReader(f):\n        termin = datetime.strptime(w[\"termin\"], \"%d.%m.%Y\").date()\n        if w[\"zaplacone\"] == \"nie\" and termin < dzis:\n            zalegle.append(w)\n\nwith smtplib.SMTP(\"smtp.firma.pl\", 587) as serwer:\n    serwer.starttls()\n    serwer.login(\"biuro@firma.pl\", os.environ[\"SMTP_HASLO\"])\n    for w in zalegle:\n        msg = EmailMessage()\n        msg[\"From\"] = \"biuro@firma.pl\"\n        msg[\"To\"] = w[\"email\"]\n        msg[\"Subject\"] = f\"Przypomnienie: {w['nr']}\"\n        msg.set_content(f\"Dzień dobry {w['klient']}, prosimy o zapłatę zamówienia {w['nr']}.\")\n        serwer.send_message(msg)\nprint(f\"Wysłano przypomnień: {len(zalegle)}\")\n",
+    "expectedCommands": [],
+    "files": {"zamowienia.csv": "nr,klient,email,termin,zaplacone\nZ/01,Anna,anna@przyklad.pl,20.09.2026,nie\nZ/02,Jan,jan@przyklad.pl,05.10.2026,nie\nZ/03,Ewa,ewa@przyklad.pl,15.09.2026,tak\nZ/04,Piotr,piotr@przyklad.pl,28.09.2026,nie\n"},
+    "env": {"SMTP_HASLO": "haslo-z-sejfu-serwera"},
+    "expectedFiles": ["zamowienia.csv"],
+    "expectedOutbox": ["anna@przyklad.pl | Przypomnienie: Z/01", "piotr@przyklad.pl | Przypomnienie: Z/04"],
+    "preview": {"title": "zamowienia.csv", "columns": ["nr", "klient", "email", "termin", "zaplacone"], "rows": [["Z/01", "Anna", "anna@przyklad.pl", "20.09.2026", "nie"], ["Z/02", "Jan", "jan@przyklad.pl", "05.10.2026", "nie"], ["Z/03", "Ewa", "ewa@przyklad.pl", "15.09.2026", "tak"], ["Z/04", "Piotr", "piotr@przyklad.pl", "28.09.2026", "nie"]]},
+    "expectedOutput": "Wysłano przypomnień: 2",
+    "hints": [
+      "Błąd 1: daty w pliku to 20.09.2026 — czytaj je przez datetime.strptime(w[\"termin\"], \"%d.%m.%Y\").date()",
+      "Błąd 2: „po terminie” znaczy, że termin był PRZED dziś: termin < dzis.",
+      "Błąd 3: każdy klient osobno — pętla for w in zalegle: z NOWĄ kopertą i tematem f\"Przypomnienie: {w['nr']}\"."
+    ]
   }
 ]

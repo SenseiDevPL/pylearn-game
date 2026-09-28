@@ -113,6 +113,12 @@ function explainPythonError(raw: string, fallback: string): string {
     return `Nie znam nazwy ${m[1]} — literówka albo zmienna nie została utworzona.`
   if (/_TOO_MANY_COMMANDS/.test(last))
     return 'Za dużo ruchów (ponad 1000) — prawdopodobnie pętla, która nigdy się nie kończy.'
+  if ((m = last.match(/AssertionError:?\s*(.*)/)))
+    return `Test nie przeszedł${m[1] ? `: ${m[1]}` : ''} — funkcja oddaje inny wynik, niż test się spodziewa.`
+  if (/day is out of range for month|must be in range \S+ for month/.test(last))
+    return 'Taki dzień nie istnieje w tym miesiącu (np. 43 września). Do dat dodaje się dni przez timedelta(days=...).'
+  if (/Invalid isoformat string|does not match format/.test(last))
+    return 'Data jest zapisana inaczej, niż kod zakłada (np. 20.09.2026 zamiast 2026-09-20). Polskie daty czyta się przez datetime.strptime(tekst, "%d.%m.%Y").'
   if ((m = last.match(/HTTPError: (\d+)/)))
     return `Strona odpowiedziała błędem ${m[1]} — nie działa albo nie ma jej pod tym adresem.`
   if (/(min|max)\(\) (arg is an empty sequence|iterable argument is empty)/.test(last))
