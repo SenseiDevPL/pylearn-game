@@ -21,8 +21,10 @@ export default function App() {
   const [executionTime, setExecutionTime] = useState<number | null>(null)
   const [hintCount, setHintCount] = useState(0)
   const [showingSolution, setShowingSolution] = useState(false)
+  const [image, setImage] = useState<string | null>(null)
 
   const currentLevel = levels[currentLevelIdx]
+  const isWorkTask = !currentLevel.grid
 
   useEffect(() => {
     gameRef.current?.loadLevel(currentLevel)
@@ -33,6 +35,7 @@ export default function App() {
     setExecutionTime(null)
     setHintCount(0)
     setShowingSolution(false)
+    setImage(null)
   }, [currentLevel])
 
   const handleRun = useCallback(async () => {
@@ -41,10 +44,12 @@ export default function App() {
     setGameState('running')
     setError(null)
     setOutput('')
+    setImage(null)
     gameRef.current?.resetLevel()
 
     try {
       const result = await execute(code, currentLevel.id)
+      setImage(result.image ?? null)
 
       if (!result.success) {
         setGameState('failure')
@@ -56,6 +61,21 @@ export default function App() {
 
       setOutput(result.output)
       setExecutionTime(result.executionTime)
+
+      if (isWorkTask) {
+        const req = currentLevel.requires
+        const expected = currentLevel.expectedOutput
+        if (expected !== undefined && result.output.trim() !== expected) {
+          setGameState('failure')
+          setError(`W konsoli miało się wypisać:\n${expected}`)
+        } else if (req && !new RegExp(req.pattern).test(code)) {
+          setGameState('failure')
+          setError(`Wynik się zgadza, ale zadanie było inne: ${req.message}`)
+        } else {
+          setGameState('success')
+        }
+        return
+      }
 
       if (result.commands.length === 0) {
         setGameState('failure')
@@ -91,7 +111,7 @@ export default function App() {
       setGameState('failure')
       setError(err instanceof Error ? err.message : 'Nieznany błąd')
     }
-  }, [code, currentLevel, execute, isReady, isRunning])
+  }, [code, currentLevel, execute, isReady, isRunning, isWorkTask])
 
   const handleNextLevel = useCallback(() => {
     const nextIdx = currentLevelIdx + 1
@@ -114,6 +134,7 @@ export default function App() {
     setError(null)
     setOutput('')
     setShowingSolution(false)
+    setImage(null)
     gameRef.current?.resetLevel()
   }, [currentLevel])
 
@@ -151,9 +172,11 @@ export default function App() {
                       ? 'bg-emerald-600/30 text-emerald-400 border border-emerald-600/30'
                       : l.ai
                         ? 'bg-violet-950/60 text-violet-300 border border-violet-700/50'
-                        : 'bg-slate-800 text-slate-500 border border-slate-700/50'
+                        : !l.grid
+                          ? 'bg-amber-950/50 text-amber-300 border border-amber-700/50'
+                          : 'bg-slate-800 text-slate-500 border border-slate-700/50'
                 }`}
-                title={l.ai ? `🤖 ${l.title}` : l.title}
+                title={l.ai ? `🤖 ${l.title}` : !l.grid ? `💼 ${l.title}` : l.title}
               >
                 {l.id}
               </button>
@@ -165,7 +188,23 @@ export default function App() {
       <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
           <LevelPanel level={currentLevel} currentHint={hintCount} onShowHint={() => setHintCount((h) => Math.min(h + 1, currentLevel.hints.length))} onShowSolution={handleShowSolution} showingSolution={showingSolution} />
-          <GameCanvas ref={gameRef} />
+          <div className={isWorkTask ? 'hidden' : ''}>
+            <GameCanvas ref={gameRef} />
+          </div>
+          {isWorkTask && (
+            <div className="w-full aspect-[4/3] rounded-xl border border-slate-700/50 bg-slate-900/60 flex items-center justify-center overflow-hidden">
+              {image ? (
+                <img src={`data:image/png;base64,${image}`} alt="Wykres z twojego kodu" className="max-w-full max-h-full bg-white" />
+              ) : (
+                <div className="text-center text-slate-500 text-sm px-6">
+                  <div className="text-4xl mb-2">📊</div>
+                  Tu pojawi się wykres, jeśli twój kod go narysuje.
+                  <br />
+                  Wynik liczb zobaczysz w konsoli pod edytorem.
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="space-y-4">
@@ -194,6 +233,7 @@ export default function App() {
             executionTime={executionTime}
             onNextLevel={handleNextLevel}
             isLastLevel={currentLevelIdx === levels.length - 1}
+            slowFirstRun={!!currentLevel.packages?.length}
           />
         </div>
       </main>

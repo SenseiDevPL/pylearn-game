@@ -12,14 +12,24 @@ BRIDGE = (ROOT / "src/workers/bridge.py").read_text()
 LEVELS = json.loads((ROOT / "src/data/levels.json").read_text())
 
 
+NO_BOARD = {"width": 1, "height": 1, "playerStart": {"x": 0, "y": 0}, "goal": {"x": 0, "y": 0}, "walls": [], "items": []}
+
+
 def run(level, code):
-    env = {"_LEVEL_JSON": json.dumps(level["grid"]), "_level_id": level["id"]}
+    env = {"_LEVEL_JSON": json.dumps(level.get("grid", NO_BOARD)), "_level_id": level["id"]}
     try:
         exec(BRIDGE + f"\n_run({json.dumps(code, ensure_ascii=False)})\n", env)
     except Exception as e:  # the game shows these as errors
         return "error", f"{type(e).__name__}: {e}", ""
     p = env["player"]
     output = "\n".join(env["_output_lines"])
+    if "grid" not in level:  # "Python w pracy": judged by console output only
+        exp, req = level.get("expectedOutput"), level.get("requires")
+        if exp is not None and output.strip() != exp:
+            return "output", repr(output[:80]), output
+        if req and not re.search(req["pattern"], code):
+            return "requires", req["message"], output
+        return "win", "", output
     if not env["_commands"]:
         return "no-commands", "", output
     if p._crashed:

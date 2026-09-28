@@ -17,11 +17,21 @@ export function LevelPanel({ level, currentHint, onShowHint, onShowSolution, sho
         </span>
         <h2 className="text-lg font-bold text-slate-100">{level.title}</h2>
       </div>
+      {!level.grid && !level.ai && (
+        <div className="mb-3 bg-amber-950/40 rounded-lg px-3 py-2 border border-amber-700/50">
+          <span className="text-amber-300 text-xs font-semibold uppercase tracking-wider">💼 Python w pracy</span>
+          <p className="text-amber-100/90 text-sm mt-0.5">
+            Bez planszy — prawdziwe zadanie z pracy biurowej. Liczy się to, co twój kod wypisze w konsoli.
+          </p>
+        </div>
+      )}
       {level.ai && (
         <div className="mb-3 bg-violet-950/50 rounded-lg px-3 py-2 border border-violet-700/50">
           <span className="text-violet-300 text-xs font-semibold uppercase tracking-wider">🤖 Sprawdź kod od AI</span>
           <p className="text-violet-200/90 text-sm mt-0.5">
-            Kod w edytorze napisał asystent AI. Uruchom go, obserwuj ludzika, znajdź błąd AI i popraw.
+            {level.grid
+              ? 'Kod w edytorze napisał asystent AI. Uruchom go, obserwuj ludzika, znajdź błąd AI i popraw.'
+              : 'Kod w edytorze napisał asystent AI. Uruchom go, sprawdź wynik w konsoli, znajdź błąd AI i popraw.'}
           </p>
         </div>
       )}

@@ -13,7 +13,10 @@ export interface Level {
   requires?: { pattern: string; message: string }
   /** What print() must output, line by line (trimmed). */
   expectedOutput?: string
-  grid: {
+  /** Python-libraries this level needs, loaded on demand (e.g. pandas, matplotlib). */
+  packages?: string[]
+  /** Missing grid = a "Python w pracy" task: no board, judged by console output. */
+  grid?: {
     width: number
     height: number
     playerStart: { x: number; y: number }
@@ -29,6 +32,8 @@ export interface ExecutionResult {
   error: string | null
   commands: GameCommand[]
   executionTime: number
+  /** PNG (base64) of a matplotlib chart the code drew, if any. */
+  image?: string
 }
 
 export interface GameCommand {

@@ -3,12 +3,15 @@ import type { GameCommand, Level, RunOutcome } from '../../types/index.ts'
 
 const COLORS = {
   floor: 0x1e293b,
-  wall: 0x475569,
+  floorAlt: 0x223047,
+  wall: 0x3f2a22,
   goal: 0x22c55e,
-  player: 0x3b82f6,
   gridLine: 0x334155,
-  item: 0xfbbf24,
+  arrow: 0xfbbf24,
 } as const
+
+// Real pictures instead of plain squares (emoji render in every browser).
+const EMOJI = { player: '🤖', item: '💎', wall: '🧱', goal: '🏁', crash: '💥' } as const
 
 interface Direction {
   x: number
@@ -25,7 +28,7 @@ const DIRECTIONS: Record<string, Direction> = {
 const TURN_ORDER = ['up', 'right', 'down', 'left']
 
 export class GameScene extends Phaser.Scene {
-  private player!: Phaser.GameObjects.Rectangle
+  private player!: Phaser.GameObjects.Text
   private goalTile!: Phaser.GameObjects.Rectangle
   private playerGridX = 0
   private playerGridY = 0
@@ -33,7 +36,7 @@ export class GameScene extends Phaser.Scene {
   private level: Level | null = null
   private isAnimating = false
   private directionIndicator!: Phaser.GameObjects.Triangle
-  private itemSprites: Map<string, Phaser.GameObjects.Arc> = new Map()
+  private itemSprites: Map<string, Phaser.GameObjects.Text> = new Map()
   private collectedItems: Set<string> = new Set()
   private tile = 64
 
@@ -45,11 +48,19 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#0f172a')
   }
 
+  private emoji(x: number, y: number, char: string, scale = 0.62) {
+    return this.add
+      .text(x, y, char, { fontSize: `${Math.round(this.tile * scale)}px`, padding: { x: 4, y: 4 } })
+      .setOrigin(0.5)
+      .setResolution(2)
+  }
+
   private itemKey(x: number, y: number) {
     return `${x},${y}`
   }
 
   loadLevel(level: Level) {
+    if (!level.grid) return
     this.level = level
     this.children.removeAll()
     this.tweens.killAll()
@@ -58,7 +69,7 @@ export class GameScene extends Phaser.Scene {
     this.itemSprites.clear()
     this.collectedItems.clear()
 
-    const { grid } = level
+    const grid = level.grid!
     const maxTileW = Math.floor((this.cameras.main.width - 20) / grid.width)
     const maxTileH = Math.floor((this.cameras.main.height - 20) / grid.height)
     this.tile = Math.min(maxTileW, maxTileH, 64)
@@ -71,10 +82,12 @@ export class GameScene extends Phaser.Scene {
         const px = offsetX + x * TILE + TILE / 2
         const py = offsetY + y * TILE + TILE / 2
         const isWall = grid.walls.some((w) => w.x === x && w.y === y)
+        const floor = (x + y) % 2 === 0 ? COLORS.floor : COLORS.floorAlt
 
         this.add
-          .rectangle(px, py, TILE - 2, TILE - 2, isWall ? COLORS.wall : COLORS.floor)
+          .rectangle(px, py, TILE - 2, TILE - 2, isWall ? COLORS.wall : floor)
           .setStrokeStyle(1, COLORS.gridLine)
+        if (isWall) this.emoji(px, py, EMOJI.wall, 0.7)
       }
     }
 
@@ -89,12 +102,13 @@ export class GameScene extends Phaser.Scene {
       yoyo: true,
       repeat: -1,
     })
+    this.emoji(goalPx, goalPy, EMOJI.goal, 0.55).setDepth(2)
 
     if (grid.items) {
       for (const item of grid.items) {
         const ix = offsetX + item.x * TILE + TILE / 2
         const iy = offsetY + item.y * TILE + TILE / 2
-        const sprite = this.add.circle(ix, iy, Math.max(5, TILE * 0.15), COLORS.item).setDepth(5)
+        const sprite = this.emoji(ix, iy, EMOJI.item, 0.45).setDepth(5)
         this.tweens.add({
           targets: sprite,
           scale: { from: 0.8, to: 1.2 },
@@ -111,20 +125,21 @@ export class GameScene extends Phaser.Scene {
     const startPx = offsetX + this.playerGridX * TILE + TILE / 2
     const startPy = offsetY + this.playerGridY * TILE + TILE / 2
 
-    const pSize = TILE - Math.max(8, Math.round(TILE * 0.2))
-    this.player = this.add.rectangle(startPx, startPy, pSize, pSize, COLORS.player).setDepth(10)
+    this.player = this.emoji(startPx, startPy, EMOJI.player, 0.66).setDepth(10)
 
-    const aSize = Math.max(5, Math.round(TILE * 0.15))
+    const aSize = Math.max(4, Math.round(TILE * 0.1))
     this.directionIndicator = this.add
-      .triangle(startPx, startPy, aSize, 0, -aSize, -aSize * 1.2, -aSize, aSize * 1.2, 0xffffff)
+      .triangle(startPx, startPy, aSize, 0, -aSize, -aSize * 1.1, -aSize, aSize * 1.1, COLORS.arrow)
       .setDepth(11)
-      .setAlpha(0.8)
     this.updateDirectionIndicator()
   }
 
   private updateDirectionIndicator() {
     if (!this.directionIndicator || !this.player) return
-    this.directionIndicator.setPosition(this.player.x, this.player.y)
+    // The arrow sits at the tile edge the robot is facing.
+    const d = DIRECTIONS[this.facing]
+    const edge = this.tile * 0.4
+    this.directionIndicator.setPosition(this.player.x + d.x * edge, this.player.y + d.y * edge)
     const angles: Record<string, number> = { right: 0, down: 90, left: 180, up: 270 }
     this.directionIndicator.setAngle(angles[this.facing] ?? 0)
   }
@@ -133,8 +148,8 @@ export class GameScene extends Phaser.Scene {
     if (!this.level) return { x: 0, y: 0 }
     const T = this.tile
     return {
-      x: (this.cameras.main.width - this.level.grid.width * T) / 2,
-      y: (this.cameras.main.height - this.level.grid.height * T) / 2,
+      x: (this.cameras.main.width - this.level.grid!.width * T) / 2,
+      y: (this.cameras.main.height - this.level.grid!.height * T) / 2,
     }
   }
 
@@ -146,7 +161,7 @@ export class GameScene extends Phaser.Scene {
       if (cmd.action === 'move') {
         const moved = await this.animateMove()
         if (!moved) {
-          this.flashPlayer(0xef4444)
+          this.showCrash()
           this.isAnimating = false
           return 'wall'
         }
@@ -165,7 +180,7 @@ export class GameScene extends Phaser.Scene {
 
     this.isAnimating = false
 
-    const { goal, items } = this.level.grid
+    const { goal, items } = this.level.grid!
     const atGoal = this.playerGridX === goal.x && this.playerGridY === goal.y
     const allCollected = !items || items.length === 0 || this.collectedItems.size >= items.length
 
@@ -200,7 +215,7 @@ export class GameScene extends Phaser.Scene {
       const dir = DIRECTIONS[this.facing]
       const newX = this.playerGridX + dir.x
       const newY = this.playerGridY + dir.y
-      const { grid } = this.level
+      const grid = this.level.grid!
 
       if (newX < 0 || newX >= grid.width || newY < 0 || newY >= grid.height) return resolve(false)
       if (grid.walls.some((w) => w.x === newX && w.y === newY)) return resolve(false)
@@ -213,8 +228,17 @@ export class GameScene extends Phaser.Scene {
       const targetX = offset.x + newX * T + T / 2
       const targetY = offset.y + newY * T + T / 2
 
+      const d = DIRECTIONS[this.facing]
+      const edge = T * 0.4
       this.tweens.add({
-        targets: [this.player, this.directionIndicator],
+        targets: this.directionIndicator,
+        x: targetX + d.x * edge,
+        y: targetY + d.y * edge,
+        duration: 300,
+        ease: 'Power2',
+      })
+      this.tweens.add({
+        targets: this.player,
         x: targetX,
         y: targetY,
         duration: 300,
@@ -234,10 +258,11 @@ export class GameScene extends Phaser.Scene {
     this.updateDirectionIndicator()
   }
 
-  private flashPlayer(color: number) {
-    const original = COLORS.player
-    this.player.setFillStyle(color)
-    this.time.delayedCall(400, () => this.player.setFillStyle(original))
+  private showCrash() {
+    const d = DIRECTIONS[this.facing]
+    const boom = this.emoji(this.player.x + d.x * this.tile * 0.5, this.player.y + d.y * this.tile * 0.5, EMOJI.crash, 0.5).setDepth(20)
+    this.tweens.add({ targets: boom, scale: { from: 0.5, to: 1.3 }, alpha: { from: 1, to: 0 }, duration: 700, onComplete: () => boom.destroy() })
+    this.tweens.add({ targets: this.player, x: this.player.x - d.x * 4, duration: 60, yoyo: true, repeat: 3 })
   }
 
   private showSpeech(text: string) {

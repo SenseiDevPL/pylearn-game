@@ -7,9 +7,11 @@ interface FeedbackOverlayProps {
   executionTime: number | null
   onNextLevel: () => void
   isLastLevel: boolean
+  /** Level loads data libraries: the first run takes a while. */
+  slowFirstRun?: boolean
 }
 
-export function FeedbackOverlay({ state, error, output, executionTime, onNextLevel, isLastLevel }: FeedbackOverlayProps) {
+export function FeedbackOverlay({ state, error, output, executionTime, onNextLevel, isLastLevel, slowFirstRun }: FeedbackOverlayProps) {
   if (state === 'idle') return null
 
   return (
@@ -17,7 +19,9 @@ export function FeedbackOverlay({ state, error, output, executionTime, onNextLev
       {state === 'running' && (
         <div className="bg-slate-800/80 rounded-lg px-4 py-3 border border-slate-700/50 flex items-center gap-3">
           <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-          <span className="text-slate-300 text-sm">Wykonuję kod...</span>
+          <span className="text-slate-300 text-sm">
+            {slowFirstRun ? 'Wykonuję kod... (za pierwszym razem ładuję narzędzia do danych, to może potrwać do 20 s)' : 'Wykonuję kod...'}
+          </span>
         </div>
       )}
 

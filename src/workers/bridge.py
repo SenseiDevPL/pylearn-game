@@ -1,4 +1,7 @@
 import json as _json
+import os as _os
+
+_os.environ["MPLBACKEND"] = "AGG"  # charts are drawn off-screen and sent as PNG
 
 # Prepended by the worker (and by scripts/check_levels.py):
 #   _LEVEL_JSON = '<grid of the current level as JSON>'

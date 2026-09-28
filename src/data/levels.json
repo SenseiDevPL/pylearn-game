@@ -1109,5 +1109,169 @@
       "goal": { "x": 6, "y": 1 },
       "walls": [], "items": [{ "x": 2, "y": 1 }, { "x": 5, "y": 1 }]
     }
+  },
+  {
+    "id": 51,
+    "title": "Porządki w liście klientów",
+    "description": "Python w pracy najczęściej sprząta dane. Ludzie wpisują imiona byle jak: ze spacjami, wielkimi literami. NOWOŚĆ: tekst.strip() obcina spacje z brzegów, tekst.title() robi Wielkie Pierwsze Litery, a sorted(lista) układa alfabetycznie. Lista.append(x) dopisuje element na koniec listy.",
+    "objective": "Wyczyść każde nazwisko (strip + title) i wypisz klientów alfabetycznie, każdego w osobnej linii.",
+    "starterCode": "klienci = [\"  anna KOWALSKA\", \"jan nowak  \", \"EWA zielińska\", \" piotr wiśniewski\"]\n\n# Twój kod: wyczyść i wypisz alfabetycznie\n",
+    "solution": "klienci = [\"  anna KOWALSKA\", \"jan nowak  \", \"EWA zielińska\", \" piotr wiśniewski\"]\n\n# Twój kod: wyczyść i wypisz alfabetycznie\nczyste = []\nfor k in klienci:\n    czyste.append(k.strip().title())\nfor k in sorted(czyste):\n    print(k)\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "\\.strip\\(\\)[\\s\\S]*\\.title\\(\\)|\\.title\\(\\)[\\s\\S]*\\.strip\\(\\)", "message": "wyczyść tekst metodami strip() i title()." },
+    "expectedOutput": "Anna Kowalska\nEwa Zielińska\nJan Nowak\nPiotr Wiśniewski",
+    "hints": [
+      "Zrób pustą listę czyste = [] i w pętli dopisuj czyste.append(...).",
+      "Wyczyszczone nazwisko: k.strip().title()",
+      "Na końcu: for k in sorted(czyste): print(k)"
+    ]
+  },
+  {
+    "id": 52,
+    "title": "Raport sprzedaży",
+    "description": "Szef pyta: ile sprzedaliśmy w tym tygodniu i ile średnio dziennie? NOWOŚĆ: sum(lista) dodaje wszystkie liczby, len(lista) mówi, ile ich jest. A f\"{liczba:.2f}\" pokazuje liczbę z dwoma miejscami po kropce — jak kwotę na paragonie.",
+    "objective": "Wypisz sumę i średnią sprzedaży w formacie z zadania.",
+    "starterCode": "sprzedaz = [1200, 850, 1430, 990, 1530]   # złotówki, poniedziałek-piątek\n\n# Wypisz:\n# Suma: ... zł\n# Średnia: ... zł   (z dwoma miejscami po kropce)\n",
+    "solution": "sprzedaz = [1200, 850, 1430, 990, 1530]   # złotówki, poniedziałek-piątek\n\nsuma = sum(sprzedaz)\nsrednia = suma / len(sprzedaz)\nprint(f\"Suma: {suma} zł\")\nprint(f\"Średnia: {srednia:.2f} zł\")\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "sum\\([\\s\\S]*len\\(|len\\([\\s\\S]*sum\\(", "message": "policz przez sum(...) i len(...), a nie ręcznie." },
+    "expectedOutput": "Suma: 6000 zł\nŚrednia: 1200.00 zł",
+    "hints": [
+      "suma = sum(sprzedaz)",
+      "srednia = suma / len(sprzedaz)",
+      "print(f\"Średnia: {srednia:.2f} zł\")"
+    ]
+  },
+  {
+    "id": 53,
+    "title": "Najlepszy produkt",
+    "description": "Sprzedaż trzymamy w słowniku: produkt → liczba sztuk. NOWOŚĆ: słownik.items() daje pary (klucz, wartość) do pętli. Szukamy największej wartości, pamiętając po drodze najlepszego kandydata — tak działa wiele raportów.",
+    "objective": "Znajdź produkt, który sprzedał się najlepiej, i wypisz go w formacie z zadania.",
+    "starterCode": "sprzedaz = {\"kawa\": 340, \"herbata\": 120, \"czekolada\": 275, \"ciastka\": 190}\n\n# Wypisz: Najlepiej sprzedaje się: ... (... szt.)\n",
+    "solution": "sprzedaz = {\"kawa\": 340, \"herbata\": 120, \"czekolada\": 275, \"ciastka\": 190}\n\nnajlepszy = \"\"\nnajwiecej = 0\nfor produkt, ile in sprzedaz.items():\n    if ile > najwiecej:\n        najwiecej = ile\n        najlepszy = produkt\nprint(f\"Najlepiej sprzedaje się: {najlepszy} ({najwiecej} szt.)\")\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "\\.items\\(\\)", "message": "przejdź po słowniku pętlą for produkt, ile in sprzedaz.items():" },
+    "expectedOutput": "Najlepiej sprzedaje się: kawa (340 szt.)",
+    "hints": [
+      "Zacznij od: najlepszy = \"\" i najwiecej = 0",
+      "for produkt, ile in sprzedaz.items(): — jeśli ile > najwiecej, zapamiętaj oba.",
+      "Po pętli wypisz wynik f-stringiem."
+    ]
+  },
+  {
+    "id": 54,
+    "title": "Plik CSV z Excela",
+    "description": "CSV to tabela z Excela zapisana jako zwykły tekst: kolumny oddzielone przecinkami. NOWOŚĆ: moduł csv. csv.DictReader czyta każdy wiersz jako słownik {nazwa kolumny: wartość}. Uwaga: wszystko z pliku to tekst — kwotę trzeba zamienić na liczbę przez float(). W pracy zamiast io.StringIO(dane) otworzysz prawdziwy plik: open(\"sprzedaz.csv\").",
+    "objective": "Policz wiersze i sumę kolumny kwota. Wypisz w formacie z zadania.",
+    "starterCode": "import csv\nimport io\n\ndane = \"\"\"data,produkt,kwota\n2026-09-01,kawa,12.50\n2026-09-01,herbata,8.00\n2026-09-02,kawa,12.50\n2026-09-02,ciastka,6.90\n\"\"\"\n\n# Wypisz:\n# Wiersze: ...\n# Razem: ... zł   (z dwoma miejscami po kropce)\n",
+    "solution": "import csv\nimport io\n\ndane = \"\"\"data,produkt,kwota\n2026-09-01,kawa,12.50\n2026-09-01,herbata,8.00\n2026-09-02,kawa,12.50\n2026-09-02,ciastka,6.90\n\"\"\"\n\nwiersze = 0\nrazem = 0\nfor wiersz in csv.DictReader(io.StringIO(dane)):\n    wiersze += 1\n    razem += float(wiersz[\"kwota\"])\nprint(f\"Wiersze: {wiersze}\")\nprint(f\"Razem: {razem:.2f} zł\")\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "DictReader", "message": "czytaj dane przez csv.DictReader." },
+    "expectedOutput": "Wiersze: 4\nRazem: 39.90 zł",
+    "hints": [
+      "for wiersz in csv.DictReader(io.StringIO(dane)):",
+      "Kwota to tekst: float(wiersz[\"kwota\"])",
+      "Licz wiersze += 1 i razem += ... w pętli, wypisz po pętli."
+    ]
+  },
+  {
+    "id": 55,
+    "title": "Tabela jak w Excelu (pandas)",
+    "description": "pandas to Excel w Pythonie — najpopularniejsze narzędzie do danych na świecie. Wczytana tabela to DataFrame. NOWOŚĆ: df.groupby(\"miasto\")[\"kwota\"].sum() działa jak tabela przestawna: sumuje kwoty osobno dla każdego miasta. .sort_values(ascending=False) układa od największej.",
+    "objective": "Zsumuj sprzedaż dla każdego miasta i wypisz od największej, w formacie: Miasto: kwota zł",
+    "starterCode": "import pandas as pd\nimport io\n\ndane = \"\"\"miasto,kwota\nGdańsk,120\nWarszawa,300\nGdańsk,80\nKraków,150\nWarszawa,100\n\"\"\"\ndf = pd.read_csv(io.StringIO(dane))\n\n# Twój kod: suma dla każdego miasta, od największej\n",
+    "solution": "import pandas as pd\nimport io\n\ndane = \"\"\"miasto,kwota\nGdańsk,120\nWarszawa,300\nGdańsk,80\nKraków,150\nWarszawa,100\n\"\"\"\ndf = pd.read_csv(io.StringIO(dane))\n\nwynik = df.groupby(\"miasto\")[\"kwota\"].sum().sort_values(ascending=False)\nfor miasto, suma in wynik.items():\n    print(f\"{miasto}: {suma} zł\")\n",
+    "expectedCommands": [],
+    "packages": ["pandas"],
+    "requires": { "pattern": "groupby\\(", "message": "użyj df.groupby(\"miasto\") — jak tabeli przestawnej." },
+    "expectedOutput": "Warszawa: 400 zł\nGdańsk: 200 zł\nKraków: 150 zł",
+    "hints": [
+      "wynik = df.groupby(\"miasto\")[\"kwota\"].sum()",
+      "Dołóż na końcu: .sort_values(ascending=False)",
+      "for miasto, suma in wynik.items(): print(f\"{miasto}: {suma} zł\")"
+    ]
+  },
+  {
+    "id": 56,
+    "title": "Wykres dla szefa",
+    "description": "Liczby w tabeli nudzą — szef chce obrazek. NOWOŚĆ: matplotlib rysuje wykresy. plt.bar(podpisy, wartości) robi wykres słupkowy, plt.title(\"...\") dodaje tytuł. Wykres pojawi się w miejscu planszy. Lista[-1] to ostatni element, lista[0] — pierwszy.",
+    "objective": "Narysuj wykres słupkowy sprzedaży i wypisz wzrost: ostatni miesiąc minus pierwszy.",
+    "starterCode": "import matplotlib.pyplot as plt\n\nmiesiace = [\"lip\", \"sie\", \"wrz\"]\nsprzedaz = [4200, 5100, 6000]\n\n# 1. narysuj wykres słupkowy z tytułem\n# 2. wypisz: Wzrost: ... zł\n",
+    "solution": "import matplotlib.pyplot as plt\n\nmiesiace = [\"lip\", \"sie\", \"wrz\"]\nsprzedaz = [4200, 5100, 6000]\n\nplt.bar(miesiace, sprzedaz)\nplt.title(\"Sprzedaż w kwartale\")\nprint(f\"Wzrost: {sprzedaz[-1] - sprzedaz[0]} zł\")\n",
+    "expectedCommands": [],
+    "packages": ["matplotlib"],
+    "requires": { "pattern": "plt\\.bar\\(", "message": "narysuj wykres słupkowy: plt.bar(miesiace, sprzedaz)" },
+    "expectedOutput": "Wzrost: 1800 zł",
+    "hints": [
+      "plt.bar(miesiace, sprzedaz)",
+      "plt.title(\"Sprzedaż w kwartale\")",
+      "print(f\"Wzrost: {sprzedaz[-1] - sprzedaz[0]} zł\")"
+    ]
+  },
+  {
+    "id": 57,
+    "title": "Kwoty jako tekst",
+    "ai": true,
+    "description": "Dane z formularzy i plików zawsze przychodzą jako tekst — nawet liczby. AI o tym zapomniało i próbuje dodawać tekst do liczby. Python odmawia (i dobrze — inaczej wyszłyby bzdury).",
+    "objective": "Uruchom, przeczytaj błąd i popraw tak, żeby suma wpłat się policzyła.",
+    "starterCode": "# Wpłaty z formularza — przychodzą jako tekst\nwplaty = [\"120.50\", \"80\", \"99.50\"]\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"policz sumę wpłat\"\n# Odpowiedź AI: \"Gotowe!\"\nsuma = 0\nfor w in wplaty:\n    suma = suma + w\nprint(f\"Suma wpłat: {suma} zł\")\n",
+    "solution": "# Wpłaty z formularza — przychodzą jako tekst\nwplaty = [\"120.50\", \"80\", \"99.50\"]\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"policz sumę wpłat\"\n# Odpowiedź AI: \"Gotowe!\"\nsuma = 0\nfor w in wplaty:\n    suma = suma + float(w)\nprint(f\"Suma wpłat: {suma} zł\")\n",
+    "expectedCommands": [],
+    "expectedOutput": "Suma wpłat: 300.0 zł",
+    "hints": [
+      "Błąd mówi, że nie da się dodać liczby i tekstu.",
+      "Tekst \"120.50\" zamienia na liczbę: float(\"120.50\")",
+      "suma = suma + float(w)"
+    ]
+  },
+  {
+    "id": 58,
+    "title": "Średnia z pustymi",
+    "ai": true,
+    "description": "AI dobrze pominęło puste oceny przy dodawaniu — ale dzieli przez liczbę WSZYSTKICH wpisów, razem z pustymi. Wynik wygląda wiarygodnie, a jest zaniżony. Takie błędy trafiają do raportów i nikt ich nie zauważa.",
+    "objective": "Sprawdź, przez co AI dzieli sumę, i popraw średnią.",
+    "starterCode": "oceny = [\"5\", \"4\", \"\", \"3\", \"\"]   # puste = klient nie ocenił\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"policz średnią ocenę klientów\"\n# Odpowiedź AI: \"Pomijam puste, średnia gotowa\"\nsuma = 0\nfor o in oceny:\n    if o != \"\":\n        suma += int(o)\nsrednia = suma / len(oceny)\nprint(f\"Średnia ocena: {srednia:.1f}\")\n",
+    "solution": "oceny = [\"5\", \"4\", \"\", \"3\", \"\"]   # puste = klient nie ocenił\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"policz średnią ocenę klientów\"\n# Odpowiedź AI: \"Pomijam puste, średnia gotowa\"\nsuma = 0\nile = 0\nfor o in oceny:\n    if o != \"\":\n        suma += int(o)\n        ile += 1\nsrednia = suma / ile\nprint(f\"Średnia ocena: {srednia:.1f}\")\n",
+    "expectedCommands": [],
+    "expectedOutput": "Średnia ocena: 4.0",
+    "hints": [
+      "Policz w głowie: (5 + 4 + 3) / 3 = ? A co wychodzi AI?",
+      "len(oceny) liczy też puste wpisy.",
+      "Licz osobno ile += 1 przy każdej prawdziwej ocenie i dziel przez ile."
+    ]
+  },
+  {
+    "id": 59,
+    "title": "Dane osobowe w raporcie",
+    "ai": true,
+    "description": "Bezpieczeństwo i RODO: szef poprosił tylko o LICZBĘ klientów, a AI „dla przejrzystości” wypisało całą listę z e-mailami i numerami PESEL. Raporty trafiają do maili, czatów i logów — dane osobowe wyciekają. Wypisuj tylko to, o co proszono.",
+    "objective": "Popraw raport tak, żeby zawierał wyłącznie liczbę klientów.",
+    "starterCode": "klienci = [\n    {\"imie\": \"Anna\", \"email\": \"anna@przyklad.pl\", \"pesel\": \"00000000001\"},\n    {\"imie\": \"Jan\", \"email\": \"jan@przyklad.pl\", \"pesel\": \"00000000002\"},\n    {\"imie\": \"Ewa\", \"email\": \"ewa@przyklad.pl\", \"pesel\": \"00000000003\"},\n]\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba szefa: \"napisz mi, ilu mamy klientów\"\n# Odpowiedź AI: \"Dodałem pełną listę dla przejrzystości\"\nprint(f\"Liczba klientów: {len(klienci)}\")\nprint(klienci)\n",
+    "solution": "klienci = [\n    {\"imie\": \"Anna\", \"email\": \"anna@przyklad.pl\", \"pesel\": \"00000000001\"},\n    {\"imie\": \"Jan\", \"email\": \"jan@przyklad.pl\", \"pesel\": \"00000000002\"},\n    {\"imie\": \"Ewa\", \"email\": \"ewa@przyklad.pl\", \"pesel\": \"00000000003\"},\n]\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba szefa: \"napisz mi, ilu mamy klientów\"\n# Odpowiedź AI: \"Dodałem pełną listę dla przejrzystości\"\nprint(f\"Liczba klientów: {len(klienci)}\")\n",
+    "expectedCommands": [],
+    "requires": { "pattern": "^(?![\\s\\S]*print\\(\\s*klienci\\s*\\))", "message": "nie wypisuj listy klientów — to dane osobowe." },
+    "expectedOutput": "Liczba klientów: 3",
+    "hints": [
+      "Zajrzyj do konsoli: co trafiłoby do szefa?",
+      "E-maile i PESEL-e to dane osobowe — nie mogą być w raporcie.",
+      "Usuń linijkę print(klienci)."
+    ]
+  },
+  {
+    "id": 60,
+    "title": "Wielki finał: recenzja raportu",
+    "ai": true,
+    "description": "Finał: AI przygotowało raport przychodów w pandas i twierdzi „przetestowałem, działa”. W kodzie są trzy błędy: zmyślona funkcja (z innej biblioteki), złe działanie matematyczne i brak sortowania. Poprawiaj po jednym i uruchamiaj po każdej poprawce.",
+    "objective": "Przychód = sztuki × cena, osobno dla każdego produktu, od największego. Znajdź i popraw 3 błędy AI.",
+    "starterCode": "import pandas as pd\nimport io\n\ndane = \"\"\"produkt,sztuki,cena\nkawa,10,12.5\nherbata,4,8.0\nkawa,6,12.5\nciastka,5,6.9\n\"\"\"\ndf = pd.read_csv(io.StringIO(dane))\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"przychód (sztuki × cena) dla każdego produktu, od największego\"\n# Odpowiedź AI: \"Przetestowałem, działa!\"\ndf[\"przychod\"] = df[\"sztuki\"] + df[\"cena\"]\nwynik = df.group_by(\"produkt\")[\"przychod\"].sum()\nfor produkt, kwota in wynik.items():\n    print(f\"{produkt}: {kwota:.2f} zł\")\n",
+    "solution": "import pandas as pd\nimport io\n\ndane = \"\"\"produkt,sztuki,cena\nkawa,10,12.5\nherbata,4,8.0\nkawa,6,12.5\nciastka,5,6.9\n\"\"\"\ndf = pd.read_csv(io.StringIO(dane))\n\n# 🤖 Kod wygenerowany przez asystenta AI\n# Prośba: \"przychód (sztuki × cena) dla każdego produktu, od największego\"\n# Odpowiedź AI: \"Przetestowałem, działa!\"\ndf[\"przychod\"] = df[\"sztuki\"] * df[\"cena\"]\nwynik = df.groupby(\"produkt\")[\"przychod\"].sum().sort_values(ascending=False)\nfor produkt, kwota in wynik.items():\n    print(f\"{produkt}: {kwota:.2f} zł\")\n",
+    "expectedCommands": [],
+    "packages": ["pandas"],
+    "expectedOutput": "kawa: 200.00 zł\nciastka: 34.50 zł\nherbata: 32.00 zł",
+    "hints": [
+      "Błąd 1: group_by nie istnieje w pandas (to z biblioteki polars) — w pandas jest groupby.",
+      "Błąd 2: przychód to sztuki RAZY cena, nie plus.",
+      "Błąd 3: od największego — dołóż .sort_values(ascending=False)."
+    ]
   }
 ]
