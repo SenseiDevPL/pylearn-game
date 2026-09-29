@@ -9,12 +9,47 @@ import type { GameState, Level } from './types/index.ts'
 
 const levels = levelsData as Level[]
 
+// Progress lives in this browser only. Storage can be blocked (private mode),
+// so every access is guarded and the game still works without it.
+const KEY = { done: 'pylearn-v1-done', last: 'pylearn-v1-last', code: (id: number) => `pylearn-v1-code-${id}` }
+
+function read(key: string): string | null {
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+function write(key: string, value: string | null) {
+  try {
+    if (value === null) localStorage.removeItem(key)
+    else localStorage.setItem(key, value)
+  } catch {
+    // storage blocked — progress just isn't remembered
+  }
+}
+
+function readDone(): Set<number> {
+  try {
+    return new Set(JSON.parse(read(KEY.done) ?? '[]') as number[])
+  } catch {
+    return new Set()
+  }
+}
+
+function readLastIdx(): number {
+  const idx = Number(read(KEY.last))
+  return Number.isInteger(idx) && idx >= 0 && idx < levels.length ? idx : 0
+}
+
 export default function App() {
   const gameRef = useRef<GameCanvasHandle>(null)
   const { execute, isReady, isRunning } = usePyodide()
 
-  const [currentLevelIdx, setCurrentLevelIdx] = useState(0)
-  const [code, setCode] = useState(levels[0].starterCode)
+  const [currentLevelIdx, setCurrentLevelIdx] = useState(readLastIdx)
+  const [done, setDone] = useState(readDone)
+  const [code, setCodeState] = useState(() => levels[readLastIdx()].starterCode)
   const [gameState, setGameState] = useState<GameState>('idle')
   const [error, setError] = useState<string | null>(null)
   const [output, setOutput] = useState('')
@@ -29,9 +64,43 @@ export default function App() {
   const currentLevel = levels[currentLevelIdx]
   const isWorkTask = !currentLevel.grid
 
+  // The student's code for each level survives a page refresh.
+  const setCode = useCallback(
+    (value: string) => {
+      setCodeState(value)
+      write(KEY.code(currentLevel.id), value === currentLevel.starterCode ? null : value)
+    },
+    [currentLevel]
+  )
+
+  useEffect(() => {
+    write(KEY.last, String(currentLevelIdx))
+  }, [currentLevelIdx])
+
+  // Called at the moment a level is won (not from an effect: after switching
+  // levels a stale 'success' would otherwise mark the new level as done).
+  const markDone = useCallback((id: number) => {
+    setDone((prev) => {
+      if (prev.has(id)) return prev
+      const next = new Set(prev).add(id)
+      write(KEY.done, JSON.stringify([...next]))
+      return next
+    })
+  }, [])
+
+  const handleResetProgress = useCallback(() => {
+    if (!window.confirm('Zacząć całą grę od nowa? Znikną ukończone poziomy i cały twój kod.')) return
+    try {
+      for (const k of Object.keys(localStorage)) if (k.startsWith('pylearn-v1-')) localStorage.removeItem(k)
+    } catch {
+      // storage blocked — nothing was saved anyway
+    }
+    window.location.reload()
+  }, [])
+
   useEffect(() => {
     gameRef.current?.loadLevel(currentLevel)
-    setCode(currentLevel.starterCode)
+    setCodeState(read(KEY.code(currentLevel.id)) ?? currentLevel.starterCode)
     setGameState('idle')
     setError(null)
     setOutput('')
@@ -84,6 +153,7 @@ export default function App() {
           setGameState('failure')
           setError(`Wynik się zgadza, ale zadanie było inne: ${req.message}`)
         } else {
+          markDone(currentLevel.id)
           setGameState('success')
         }
         return
@@ -110,6 +180,7 @@ export default function App() {
           return
         }
       }
+      if (outcome === 'win') markDone(currentLevel.id)
       setGameState(outcome === 'win' ? 'success' : 'failure')
       if (outcome === 'wall') {
         setError('Gracz uderzył w ścianę albo w krawędź planszy (mignął na czerwono). Sprawdź kierunek i liczbę kroków.')
@@ -123,7 +194,7 @@ export default function App() {
       setGameState('failure')
       setError(err instanceof Error ? err.message : 'Nieznany błąd')
     }
-  }, [code, currentLevel, execute, isReady, isRunning, isWorkTask])
+  }, [code, currentLevel, execute, isReady, isRunning, isWorkTask, markDone])
 
   const handleNextLevel = useCallback(() => {
     const nextIdx = currentLevelIdx + 1
@@ -138,10 +209,11 @@ export default function App() {
   const handleShowSolution = useCallback(() => {
     setCode(currentLevel.solution)
     setShowingSolution(true)
-  }, [currentLevel])
+  }, [currentLevel, setCode])
 
   const handleReset = useCallback(() => {
-    setCode(currentLevel.starterCode)
+    setCodeState(currentLevel.starterCode)
+    write(KEY.code(currentLevel.id), null)
     setGameState('idle')
     setError(null)
     setOutput('')
@@ -174,6 +246,14 @@ export default function App() {
             {isReady ? 'Python gotowy' : 'Ładowanie Pythona...'}
           </div>
         </div>
+        <div className="flex items-center justify-between mb-2 text-xs">
+          <span className="text-slate-400">
+            Ukończone: <b className="text-emerald-400">{done.size}</b> z {levels.length}
+          </span>
+          <button onClick={handleResetProgress} className="text-slate-500 hover:text-red-300 transition-colors">
+            ↺ Zacznij grę od nowa
+          </button>
+        </div>
         <div className="flex gap-1 flex-wrap">
           {levels.map((l, i) => {
             return (
@@ -183,7 +263,7 @@ export default function App() {
                 className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
                   i === currentLevelIdx
                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-                    : i < currentLevelIdx
+                    : done.has(l.id)
                       ? 'bg-emerald-600/30 text-emerald-400 border border-emerald-600/30'
                       : l.ai
                         ? 'bg-violet-950/60 text-violet-300 border border-violet-700/50'
@@ -191,7 +271,7 @@ export default function App() {
                           ? 'bg-amber-950/50 text-amber-300 border border-amber-700/50'
                           : 'bg-slate-800 text-slate-500 border border-slate-700/50'
                 }`}
-                title={l.ai ? `🤖 ${l.title}` : !l.grid ? `💼 ${l.title}` : l.title}
+                title={`${done.has(l.id) ? '✅ ' : ''}${l.ai ? '🤖 ' : !l.grid ? '💼 ' : ''}${l.title}`}
               >
                 {l.id}
               </button>
